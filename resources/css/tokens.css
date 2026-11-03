@@ -1,0 +1,70 @@
+:root {
+  /* Surface & text (Dark Mode) */
+  --canvas: #0b0f19; /* Latar Belakang Utama: Hitam kebiruan pekat (dark navy) */
+  --surface: #151b26; /* Latar Permukaan: Sedikit lebih terang untuk kedalaman */
+  --ink: #f8fafc; /* Teks Utama: Putih terang */
+  --stone: #8b949e; /* Teks Sekunder: Abu-abu redup */
+  --ash: #64748b; /* Placeholder & hairline */
+  --hairline: #1e293b; /* Garis tepi (border) halus */
+
+  /* Warna Aksen (Hijau Zamrud / Emerald Teal) */
+  --teal: #10b981; /* Hijau cerah zamrud */
+  --teal-hover: #059669;
+
+  /* Badge level */
+  --sage: #10b981;
+  --gold: #d97706;
+  --clay: #e11d48;
+  --espresso: #881337;
+  --forest: #065f46;
+  --error: #ef4444;
+
+  /* Action button (Cari / Execute) */
+  --action-blue: #10b981;
+  --action-blue-hover: #059669;
+
+  /* Tipografi */
+  --font-serif: 'Fraunces', 'Newsreader', Georgia, serif;
+  --font-sans: 'Inter', 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Bentuk */
+  --radius-input: 12px;
+  --radius-card: 16px;
+  --radius-pill: 9999px;
+
+  /* Spasi (basis 8px) */
+  --space-half: 4px;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-12: 96px;
+
+  /* Elevasi */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  /* Shadcn / Tailwind v4 Theme Variables */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  --primary: var(--teal);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface);
+  --secondary-foreground: var(--ink);
+  --muted: #1e293b;
+  --muted-foreground: var(--stone);
+  --accent: #1e293b;
+  --accent-foreground: var(--ink);
+  --destructive: var(--error);
+  --destructive-foreground: #ffffff;
+  --border: var(--hairline);
+  --input: #263345;
+  --ring: var(--teal);
+  --radius: 0.5rem;
+}
