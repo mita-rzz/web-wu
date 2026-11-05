@@ -119,11 +119,11 @@ main:focus { outline: none; }
 .feed__more { display: grid; justify-items: center; gap: var(--space-2); margin-top: var(--space-6); }
 .feed__end { color: var(--stone); font-size: 14px; }
 
-.grid { display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 768px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.grid > li { min-width: 0; display: flex; }
-.grid > li > * { flex: 1; }
+.writeup-grid { display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .writeup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .writeup-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.writeup-grid > li { min-width: 0; display: flex; }
+.writeup-grid > li > * { flex: 1; }
 
 /* Kartu */
 .card { position: relative; display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; min-height: 296px; padding: var(--space-3); background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-card); transition: transform 0.2s ease; }

@@ -35,9 +35,9 @@ export default function Register() {
         <AuthLayout title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Name</Label>
+                <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="name" className="text-sm font-medium">Name</Label>
                         <Input
                             id="name"
                             type="text"
@@ -50,11 +50,11 @@ export default function Register() {
                             disabled={processing}
                             placeholder="Full name"
                         />
-                        <InputError message={errors.name} className="mt-2" />
+                        <InputError message={errors.name} className="mt-1" />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
                         <Input
                             id="email"
                             type="email"
@@ -69,8 +69,8 @@ export default function Register() {
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                         <Input
                             id="password"
                             type="password"
@@ -85,8 +85,8 @@ export default function Register() {
                         <InputError message={errors.password} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="password_confirmation" className="text-sm font-medium">Confirm password</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
@@ -101,8 +101,8 @@ export default function Register() {
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="w-full" tabIndex={5} disabled={processing}>
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Create account
                     </Button>
                 </div>

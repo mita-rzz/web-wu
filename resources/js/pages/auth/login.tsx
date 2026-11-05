@@ -40,9 +40,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <Head title="Log in" />
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
+                <div className="flex flex-col gap-5">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
                         <Input
                             id="email"
                             type="email"
@@ -57,11 +57,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                             {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
+                                <TextLink href={route('password.request')} className="text-sm" tabIndex={5}>
                                     Forgot password?
                                 </TextLink>
                             )}
@@ -79,7 +79,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <InputError message={errors.password} />
                     </div>
 
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center gap-3">
                         <Checkbox
                             id="remember"
                             name="remember"
@@ -87,11 +87,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             checked={data.remember}
                             onCheckedChange={(checked) => setData('remember', !!checked)}
                         />
-                        <Label htmlFor="remember" className="cursor-pointer">Remember me</Label>
+                        <Label htmlFor="remember" className="cursor-pointer text-sm">Remember me</Label>
                     </div>
 
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="w-full" tabIndex={4} disabled={processing}>
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Log in
                     </Button>
                 </div>
