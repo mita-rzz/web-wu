@@ -1,3 +1,23 @@
 show tables;
 User::all();
 User::get()
+App\Models\User::count();
+App\Models\Category::count();
+App\Models\Category::count();
+App\Models\Category::count();
+App\Models\Category::count();
+App\Models\User::count();          
+App\Models\Category::count();
+App\Models\Tag::count(); 
+App\Models\Tool::count();
+App\Models\Writeup::count();       
+App\Models\Writeup::count();       
+App\Models\Writeup::published()->count();   // 17
+
+App\Models\Writeup::published()->count();
+
+App\Models\Writeup::first()->tags->pluck('name');
+User::all()
+Too::All()
+Too::All();
+Tool::All();
