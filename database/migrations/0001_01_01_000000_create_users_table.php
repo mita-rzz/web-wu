@@ -17,7 +17,6 @@ return new class extends Migration
             $table->text('bio')->nullable();
             $table->enum('role', ['author', 'admin'])->default('author');
             $table->enum('status', ['active', 'banned'])->default('active');
-            // Di luar ERD, dipertahankan untuk fitur bawaan (lihat asumsi 2)
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
