@@ -9,8 +9,22 @@
 </head>
 <body class="font-sans antialiased bg-page text-gray-50">
 <header class="border-b border-line">
-        <div class="flex h-16 w-full items-center justify-between px-8">
+  
+    
+    <div class="flex h-16 w-full items-center justify-between px-8">
         <a href="/" class="text-3xl font-semibold tracking-tight text-accent">SolveLog</a>
+
+      <x-primary-button href="/test" class="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-gray-950 hover:opacity-90 transition">
+    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    <span>Create Post</span>
+</x-primary-button>
+    
+
+
+
+
 
         <nav class="flex items-center gap-6 text-base text-gray-400">
             @auth
