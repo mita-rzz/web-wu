@@ -13,11 +13,22 @@ App\Models\Tool::count();
 App\Models\Writeup::count();       
 App\Models\Writeup::count();       
 App\Models\Writeup::published()->count();   // 17
-
 App\Models\Writeup::published()->count();
-
 App\Models\Writeup::first()->tags->pluck('name');
 User::all()
 Too::All()
 Too::All();
 Tool::All();
+User::All;
+DB::select('SHOW TABLES');
+users:all();
+users::all();
+DB::table('users')->get();
+Users::all();
+users::all();
+User::all();
+Writeup.php
+Writeup.php::all()
+Writeup.php::all();
+Writeup::all();
+Writeup::all();

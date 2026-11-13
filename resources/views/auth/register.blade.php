@@ -7,17 +7,17 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Name -->
+        <!-- Username -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="mt-1.5" type="text" name="name" :value="old('name')" placeholder="Full name" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-1.5" />
+            <x-input-label for="username" :value="__('Username')" />
+            <x-text-input id="username" class="mt-1.5" type="text" name="username" :value="old('username')" placeholder="Username" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('username')" class="mt-1.5" />
         </div>
 
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email address')" />
-            <x-text-input id="email" class="mt-1.5" type="email" name="email" :value="old('email')" placeholder="email@example.com" required autocomplete="username" />
+            <x-text-input id="email" class="mt-1.5" type="email" name="email" :value="old('email')" placeholder="email@example.com" required autocomplete="email" />
             <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
         </div>
 
