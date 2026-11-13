@@ -43,3 +43,5 @@ START
 docker compose -f compose.dev.yaml exec app rm -f public/hot
 docker compose -f compose.dev.yaml exec node npm run build
 ```
+
+git archive --format=zip --output=../nama-proyek.zip HEAD
