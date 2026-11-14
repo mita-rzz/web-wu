@@ -26,18 +26,8 @@
 @endphp
 
 <x-public-layout>
-    {{-- HERO --}}
-    <section class="mx-auto max-w-6xl px-6 pb-12 pt-16">
-        <p class="{{ $label }}">Write-up CTF &amp; Bug Bounty</p>
-
-        <h1 class="mt-5 font-serif text-5xl font-normal leading-[1.1] tracking-tight md:text-6xl">
-            Arsip Write-Up<br>CTF &amp; Bug Bounty.
-        </h1>
-
-        <p class="mt-5 max-w-md text-base leading-relaxed text-gray-400">
-            Telusuri write-up CTF, bug bounty, dan eksploitasi keamanan siber dari komunitas.
-        </p>
-    </section>
+  
+    
 
     {{-- PENCARIAN + FILTER --}}
     <section class="border-t border-line">

@@ -122,6 +122,31 @@ class Writeup extends Model
     }
 
     /**
+     * Cari berdasarkan judul ATAU nama tag. Input dipakai sebagai binding
+     * (bukan disisipkan ke SQL); karakter wildcard LIKE di-escape dengan "!".
+     *
+     * @param  Builder<Writeup>  $query
+     * @return Builder<Writeup>
+     */
+    public function scopeSearch(Builder $query, string $term): Builder
+    {
+        $term = trim($term);
+
+        if ($term === '') {
+            return $query;
+        }
+
+        $like = '%'.strtr($term, ['!' => '!!', '%' => '!%', '_' => '!_']).'%';
+
+        return $query->where(function (Builder $q) use ($like): void {
+            $q->whereRaw("writeups.title LIKE ? ESCAPE '!'", [$like])
+                ->orWhereHas('tags', function (Builder $tags) use ($like): void {
+                    $tags->whereRaw("tags.name LIKE ? ESCAPE '!'", [$like]);
+                });
+        });
+    }
+
+    /**
      * Penulis write-up (FK: author_id).
      *
      * @return BelongsTo<User, $this>

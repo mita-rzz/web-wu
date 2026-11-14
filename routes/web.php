@@ -5,7 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WriteupController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('dashboard');
+Route::get('/', [WriteupController::class, 'index'])->name('dashboard');
 Route::redirect('/dashboard', '/');
 
 Route::middleware('auth')->group(function () {

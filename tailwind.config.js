@@ -13,6 +13,7 @@ export default {
     theme: {
         extend: {
             colors: {
+                // Token lama (dipakai halaman lain) — jangan dihapus.
                 page:'#0A0E17',
                 surface: '#111827',
                 line: '#1F2937',
@@ -24,7 +25,29 @@ export default {
                     insane: '#EF4444',
             },
 
-            }
+                // Palet dashboard "Arsip Write-Up" (mengikuti arsip_write_up_solvelog.html).
+                bgMain: '#0B1018',
+                panel: '#121B29',
+                borderMain: '#293548',
+                textMain: '#F3F6FA',
+                textSec: '#A9B7CA',
+            },
+
+            fontFamily: {
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+            },
+
+            maxWidth: {
+                container: '1120px',
+            },
+
+            spacing: {
+                'btn-h': '44px',
+            },
+
+            borderRadius: {
+                btn: '10px',
+            },
         },
     },
 

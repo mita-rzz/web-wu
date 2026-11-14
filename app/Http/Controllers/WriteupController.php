@@ -14,6 +14,7 @@ use App\Models\Tag;
 use App\Models\Tool;
 use App\Models\User;
 use App\Models\Writeup;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,96 @@ class WriteupController extends Controller
      * Jumlah percobaan ulang bila dua request menghasilkan slug yang sama bersamaan.
      */
     private const SLUG_ATTEMPTS = 3;
+
+    /**
+     * Jumlah write-up per halaman pada dashboard.
+     */
+    private const PER_PAGE = 12;
+
+    /**
+     * Batas panjang kata kunci pencarian.
+     */
+    private const SEARCH_MAX_LENGTH = 100;
+
+    /**
+     * Dashboard "Arsip Write-Up": daftar write-up + pencarian dan filter di server.
+     */
+    public function index(Request $request): View|RedirectResponse
+    {
+        $tab = $this->queryString($request, 'tab') === 'saya' ? 'saya' : 'semua';
+        $user = $request->user();
+
+        // Tab "Postingan Saya" hanya untuk user login.
+        if ($tab === 'saya' && $user === null) {
+            return redirect()->guest(route('login'));
+        }
+
+        // Semua input filter divalidasi; nilai tidak valid diabaikan (dianggap "Semua").
+        $keyword = mb_substr($this->queryString($request, 'q'), 0, self::SEARCH_MAX_LENGTH);
+
+        $categories = Category::query()->orderBy('id')->get(['id', 'name', 'slug']);
+        $category = $categories->firstWhere('slug', $this->queryString($request, 'kategori'));
+        $level = WriteupDifficulty::tryFrom($this->queryString($request, 'level'));
+
+        $query = $tab === 'saya'
+            ? Writeup::query()->where('author_id', $user->id) // semua status, termasuk draft
+            : Writeup::published();
+
+        $query
+            ->with(['author:id,username,display_name', 'category:id,name,slug', 'tags:id,name'])
+            ->when($category !== null, fn (Builder $q) => $q->where('category_id', $category->id))
+            ->when($level !== null, fn (Builder $q) => $q->byDifficulty($level))
+            ->when($keyword !== '', fn (Builder $q) => $q->search($keyword));
+
+        // Draft tidak punya published_at, jadi tab "saya" diurutkan menurut tanggal yang tampil di kartu.
+        if ($tab === 'saya') {
+            $query->orderByRaw('coalesce(published_at, created_at) desc');
+        } else {
+            $query->orderByDesc('published_at');
+        }
+
+        $writeups = $query->orderByDesc('id')->paginate(self::PER_PAGE)->withQueryString();
+
+        return view('writeups.index', [
+            'writeups' => $writeups,
+            'excerpts' => $writeups->getCollection()
+                ->mapWithKeys(fn (Writeup $w): array => [$w->id => $this->excerpt($w->content_md)]),
+            'categories' => $categories,
+            'levels' => WriteupDifficulty::cases(),
+            'filters' => [
+                'tab' => $tab,
+                'q' => $keyword,
+                'kategori' => $category?->slug,
+                'level' => $level?->value,
+            ],
+        ]);
+    }
+
+    /**
+     * Ambil query string sebagai string; array atau tipe lain dianggap kosong.
+     */
+    private function queryString(Request $request, string $key): string
+    {
+        $value = $request->query($key);
+
+        return is_string($value) ? trim($value) : '';
+    }
+
+    /**
+     * Ringkasan kartu dari Markdown: tanpa sintaks, gambar, judul, dan blok kode.
+     */
+    private function excerpt(string $markdown): string
+    {
+        // Cukup bagian awal; write-up bisa sangat panjang.
+        $html = Str::markdown(mb_substr($markdown, 0, 3000), ['html_input' => 'strip']);
+
+        // Judul/blok kode/tabel bukan ringkasan; gambar hilang bersama strip_tags.
+        $html = preg_replace('#<(h[1-6]|pre|table)\b.*?</\1>#is', ' ', $html) ?? $html;
+        $text = strip_tags(str_replace('<', ' <', $html));
+        $text = trim(preg_replace('/\s+/u', ' ', html_entity_decode($text, ENT_QUOTES | ENT_HTML5)) ?? '');
+
+        return Str::limit($text, 160);
+    }
 
     public function create(Request $request): View
     {
