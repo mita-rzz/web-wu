@@ -186,7 +186,24 @@ class WriteupIndexTest extends TestCase
         $this->get('/?tab=saya')->assertRedirect(route('login'));
     }
 
-    public function test_tab_saya_menampilkan_semua_status_milik_sendiri_saja(): void
+    public function test_tab_saya_lama_diarahkan_ke_halaman_postingan_saya(): void
+    {
+        $this->actingAs($this->buatUser())->get('/?tab=saya')
+            ->assertRedirect(route('writeups.mine'));
+    }
+
+    public function test_dashboard_tidak_lagi_menampilkan_draft_atau_milik_sendiri_sebagai_tab(): void
+    {
+        $saya = $this->buatUser(username: 'saya');
+        $this->buatWriteup($saya, 'Punya Saya Draft', ['status' => WriteupStatus::Draft]);
+
+        $this->actingAs($saya)->get('/')
+            ->assertOk()
+            ->assertDontSee('Punya Saya Draft')
+            ->assertDontSee('tab=saya', false);
+    }
+
+    public function test_halaman_postingan_saya_menampilkan_semua_status_milik_sendiri_saja(): void
     {
         $saya = $this->buatUser(username: 'saya');
         $lain = $this->buatUser(username: 'lain');
@@ -195,24 +212,22 @@ class WriteupIndexTest extends TestCase
         $this->buatWriteup($lain, 'Punya Orang Lain');
         $this->buatWriteup($lain, 'Draft Orang Lain', ['status' => WriteupStatus::Draft]);
 
-        $this->actingAs($saya)->get('/?tab=saya')
+        $this->actingAs($saya)->get(route('writeups.mine'))
             ->assertOk()
             ->assertSee('Postingan Saya')
             ->assertSee('Punya Saya Terbit')
             ->assertSee('Punya Saya Draft')
             ->assertSee('Draft</span>', false)
             ->assertDontSee('Punya Orang Lain')
-            ->assertDontSee('Draft Orang Lain')
-            ->assertSee('2 write-up');
+            ->assertDontSee('Draft Orang Lain');
     }
 
-    public function test_tab_saya_kosong_menampilkan_empty_state(): void
+    public function test_halaman_postingan_saya_kosong_menampilkan_empty_state(): void
     {
-        $this->actingAs($this->buatUser())->get('/?tab=saya')
+        $this->actingAs($this->buatUser())->get(route('writeups.mine'))
             ->assertOk()
             ->assertSee('Belum ada write-up yang kamu publikasikan.')
-            ->assertSee('Buat Write-Up Pertama')
-            ->assertSee('0 write-up');
+            ->assertSee('Buat Write-Up Pertama');
     }
 
     public function test_banner_flash_menampilkan_tautan_postingan_saya_untuk_user_login(): void
@@ -222,7 +237,7 @@ class WriteupIndexTest extends TestCase
             ->get('/')
             ->assertSee('Write-up berhasil dipublikasikan.')
             ->assertSee('Lihat postingan saya')
-            ->assertSee(route('dashboard', ['tab' => 'saya']));
+            ->assertSee(route('writeups.mine'));
     }
 
     public function test_banner_flash_untuk_tamu_tanpa_tautan_postingan_saya(): void

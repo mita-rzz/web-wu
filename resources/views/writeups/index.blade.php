@@ -1,11 +1,9 @@
 @php
-    $tab = $filters['tab'];
     $punyaFilter = $filters['q'] !== '' || $filters['kategori'] !== null || $filters['level'] !== null;
 
     // URL dashboard dengan filter saat ini; $ubah menimpa sebagian (halaman selalu kembali ke 1).
     $url = fn (array $ubah = []) => route('dashboard', array_filter(
         array_merge([
-            'tab' => $tab === 'saya' ? 'saya' : null,
             'q' => $filters['q'],
             'kategori' => $filters['kategori'],
             'level' => $filters['level'],
@@ -24,7 +22,6 @@
     {{-- Panel pencarian + filter --}}
     <section class="mt-6 rounded-xl border border-borderMain bg-panel p-5">
         <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col gap-3 sm:flex-row">
-            @if ($tab === 'saya')<input type="hidden" name="tab" value="saya">@endif
             @if ($filters['kategori'] !== null)<input type="hidden" name="kategori" value="{{ $filters['kategori'] }}">@endif
             @if ($filters['level'] !== null)<input type="hidden" name="level" value="{{ $filters['level'] }}">@endif
 
@@ -100,9 +97,7 @@
                         Reset filter
                     </a>
                 @else
-                    <p class="mb-6 text-base text-textSec">
-                        {{ $tab === 'saya' ? 'Belum ada write-up yang kamu publikasikan.' : 'Belum ada write-up yang dipublikasikan.' }}
-                    </p>
+                    <p class="mb-6 text-base text-textSec">Belum ada write-up yang dipublikasikan.</p>
                     <a href="{{ route('writeups.create') }}" class="inline-flex h-btn-h items-center rounded-btn border border-borderMain bg-panel px-6 font-medium text-textMain transition hover:border-accent hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent">
                         Buat Write-Up Pertama
                     </a>

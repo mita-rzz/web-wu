@@ -8,6 +8,7 @@ use App\Enums\UserStatus;
 use App\Enums\WriteupDifficulty;
 use App\Enums\WriteupStatus;
 use App\Http\Requests\StoreWriteupRequest;
+use App\Http\Requests\UpdateWriteupRequest;
 use App\Models\Category;
 use App\Models\MediaUpload;
 use App\Models\Tag;
@@ -18,8 +19,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class WriteupController extends Controller
@@ -49,12 +52,12 @@ class WriteupController extends Controller
      */
     public function index(Request $request): View|RedirectResponse
     {
-        $tab = $this->queryString($request, 'tab') === 'saya' ? 'saya' : 'semua';
-        $user = $request->user();
-
-        // Tab "Postingan Saya" hanya untuk user login.
-        if ($tab === 'saya' && $user === null) {
-            return redirect()->guest(route('login'));
+        // Tab "saya" sudah dipindah ke halaman sendiri; tautan lama tetap berfungsi.
+        // Tamu langsung ke login (bukan lewat redirect ganda).
+        if ($this->queryString($request, 'tab') === 'saya') {
+            return $request->user() === null
+                ? redirect()->guest(route('login'))
+                : redirect()->route('writeups.mine');
         }
 
         // Semua input filter divalidasi; nilai tidak valid diabaikan (dianggap "Semua").
@@ -64,24 +67,15 @@ class WriteupController extends Controller
         $category = $categories->firstWhere('slug', $this->queryString($request, 'kategori'));
         $level = WriteupDifficulty::tryFrom($this->queryString($request, 'level'));
 
-        $query = $tab === 'saya'
-            ? Writeup::query()->where('author_id', $user->id) // semua status, termasuk draft
-            : Writeup::published();
-
-        $query
+        $writeups = Writeup::published()
             ->with(['author:id,username,display_name', 'category:id,name,slug', 'tags:id,name'])
             ->when($category !== null, fn (Builder $q) => $q->where('category_id', $category->id))
             ->when($level !== null, fn (Builder $q) => $q->byDifficulty($level))
-            ->when($keyword !== '', fn (Builder $q) => $q->search($keyword));
-
-        // Draft tidak punya published_at, jadi tab "saya" diurutkan menurut tanggal yang tampil di kartu.
-        if ($tab === 'saya') {
-            $query->orderByRaw('coalesce(published_at, created_at) desc');
-        } else {
-            $query->orderByDesc('published_at');
-        }
-
-        $writeups = $query->orderByDesc('id')->paginate(self::PER_PAGE)->withQueryString();
+            ->when($keyword !== '', fn (Builder $q) => $q->search($keyword))
+            ->orderByDesc('published_at')
+            ->orderByDesc('id')
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
 
         return view('writeups.index', [
             'writeups' => $writeups,
@@ -90,7 +84,6 @@ class WriteupController extends Controller
             'categories' => $categories,
             'levels' => WriteupDifficulty::cases(),
             'filters' => [
-                'tab' => $tab,
                 'q' => $keyword,
                 'kategori' => $category?->slug,
                 'level' => $level?->value,
@@ -122,6 +115,109 @@ class WriteupController extends Controller
         $text = trim(preg_replace('/\s+/u', ' ', html_entity_decode($text, ENT_QUOTES | ENT_HTML5)) ?? '');
 
         return Str::limit($text, 160);
+    }
+
+    /**
+     * Halaman "Postingan Saya": semua write-up milik user login (published dan draft).
+     */
+    public function mine(Request $request): View
+    {
+        $writeups = Writeup::query()
+            ->where('author_id', $request->user()->id)
+            ->with(['category:id,name,slug', 'tags:id,name'])
+            // Draft tidak punya published_at; urut menurut tanggal yang tampil di baris.
+            ->orderByRaw('coalesce(published_at, created_at) desc')
+            ->orderByDesc('id')
+            ->paginate(self::PER_PAGE);
+
+        return view('writeups.mine', ['writeups' => $writeups]);
+    }
+
+    /**
+     * Halaman edit: form yang sama dengan create, berisi data write-up.
+     * Otorisasi: middleware can:update,writeup pada route.
+     */
+    public function edit(Writeup $writeup): View
+    {
+        return view('writeups.edit', [
+            'writeup' => $writeup->load(['tags:id,name', 'tools:id,name']),
+            'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
+            'tags' => Tag::query()->orderBy('name')->get(['id', 'name']),
+            'tools' => Tool::query()->orderBy('name')->get(['id', 'name']),
+            'difficulties' => WriteupDifficulty::cases(),
+        ]);
+    }
+
+    public function update(UpdateWriteupRequest $request, Writeup $writeup): RedirectResponse
+    {
+        $data = $request->validated();
+        $user = $request->user();
+        $status = WriteupStatus::from($data['status']);
+
+        // Slug sengaja tidak diubah supaya URL stabil.
+        DB::transaction(function () use ($user, $writeup, $data, $status): void {
+            $writeup->update([
+                'category_id' => $data['category_id'],
+                'title' => $data['title'],
+                'content_md' => $data['content_md'],
+                'difficulty' => $data['difficulty'],
+                'status' => $status,
+                'published_at' => $this->publishedAtBaru($writeup, $status),
+            ]);
+
+            $writeup->tags()->sync($data['tags'] ?? []);
+            $writeup->tools()->sync($data['tools'] ?? []);
+
+            $this->linkMedia($user, $writeup);
+        });
+
+        return redirect()
+            ->route('writeups.mine')
+            ->with('status', 'Write-up berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus write-up (soft delete) setelah password dikonfirmasi ulang.
+     * Otorisasi dan pembatasan percobaan ada di middleware route.
+     */
+    public function destroy(Request $request, Writeup $writeup): RedirectResponse
+    {
+        try {
+            $request->validateWithBag('writeupDeletion', [
+                'password' => ['required', 'current_password'],
+            ], [
+                'password.required' => 'Password wajib diisi.',
+                'password.current_password' => 'Password salah.',
+            ]);
+        } catch (ValidationException $e) {
+            // Modal di halaman daftar dibuka lagi untuk write-up yang sama.
+            $request->session()->flash('hapus_slug', $writeup->slug);
+
+            throw $e;
+        }
+
+        // Soft delete (bukan forceDelete) agar slug tetap tercadangkan untuk uniqueSlug().
+        $writeup->delete();
+
+        return redirect()
+            ->route('writeups.mine')
+            ->with('status', 'Write-up berhasil dihapus.');
+    }
+
+    /**
+     * published_at menurut transisi status: draft -> published = sekarang,
+     * published -> published = dipertahankan, published -> draft = null
+     * (konsisten dengan scope Writeup::published()).
+     */
+    private function publishedAtBaru(Writeup $writeup, WriteupStatus $status): ?Carbon
+    {
+        if ($status === WriteupStatus::Draft) {
+            return null;
+        }
+
+        return $writeup->status === WriteupStatus::Published && $writeup->published_at !== null
+            ? $writeup->published_at
+            : now();
     }
 
     public function create(Request $request): View

@@ -1,4 +1,9 @@
 @props(['title' => null])
+
+@php
+    // Gaya tombol "Postingan Saya": aktif bila sedang di halamannya.
+    $mineAktif = request()->routeIs('writeups.mine');
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -30,8 +35,8 @@
 
                 {{-- Navigasi desktop --}}
                 <div class="hidden items-center gap-3 md:flex">
-                    <a href="{{ route('dashboard', ['tab' => 'saya']) }}"
-                       class="inline-flex h-btn-h items-center rounded-btn border border-borderMain px-4 font-medium text-textSec transition hover:border-textSec hover:text-textMain focus:outline-none focus:ring-2 focus:ring-accent">
+                    <a href="{{ route('writeups.mine') }}" @if ($mineAktif) aria-current="page" @endif
+                       class="inline-flex h-btn-h items-center rounded-btn border px-4 font-medium transition focus:outline-none focus:ring-2 focus:ring-accent {{ $mineAktif ? 'border-accent bg-accent/10 text-accent' : 'border-borderMain text-textSec hover:border-textSec hover:text-textMain' }}">
                         Postingan Saya
                     </a>
                     <a href="{{ route('writeups.create') }}"
@@ -41,7 +46,10 @@
 
                     <div class="ml-4 flex items-center gap-3 border-l border-borderMain pl-4">
                         @auth
-                            <span class="text-sm font-medium text-textMain" title="{{ Auth::user()->display_name }}">{{ Auth::user()->username }}</span>
+                            <span class="inline-flex items-center gap-2 text-sm font-medium text-textMain" title="{{ Auth::user()->display_name }}">
+                                <span class="h-2 w-2 rounded-full bg-accent blink-green-light" aria-hidden="true"></span>
+                                {{ Auth::user()->username }}
+                            </span>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="rounded text-sm text-textSec hover:text-textMain focus:outline-none focus:ring-2 focus:ring-accent">Logout</button>
@@ -55,7 +63,10 @@
                 {{-- Akun mobile (baris 1) --}}
                 <div class="flex items-center gap-3 md:hidden">
                     @auth
-                        <span class="text-sm font-medium text-textMain" title="{{ Auth::user()->display_name }}">{{ Auth::user()->username }}</span>
+                        <span class="inline-flex items-center gap-1.5 text-sm font-medium text-textMain" title="{{ Auth::user()->display_name }}">
+                            <span class="h-2 w-2 rounded-full bg-accent blink-green-light" aria-hidden="true"></span>
+                            {{ Auth::user()->username }}
+                        </span>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="text-sm text-textSec hover:text-textMain">Logout</button>
@@ -68,8 +79,8 @@
 
             {{-- Tombol mobile (baris 2) --}}
             <div class="mt-4 flex gap-3 md:hidden">
-                <a href="{{ route('dashboard', ['tab' => 'saya']) }}"
-                   class="inline-flex h-btn-h flex-1 items-center justify-center rounded-btn border border-borderMain px-4 text-sm font-medium text-textSec transition hover:text-textMain">
+                <a href="{{ route('writeups.mine') }}" @if ($mineAktif) aria-current="page" @endif
+                   class="inline-flex h-btn-h flex-1 items-center justify-center rounded-btn border px-4 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent {{ $mineAktif ? 'border-accent bg-accent/10 text-accent' : 'border-borderMain text-textSec hover:text-textMain' }}">
                     Postingan Saya
                 </a>
                 <a href="{{ route('writeups.create') }}"
@@ -89,7 +100,7 @@
                     {{ session('status') }}
                 </div>
                 @auth
-                    <a href="{{ route('dashboard', ['tab' => 'saya']) }}" class="rounded px-1 text-textMain underline hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent">
+                    <a href="{{ route('writeups.mine') }}" class="rounded px-1 text-textMain underline hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent">
                         Lihat postingan saya
                     </a>
                 @endauth

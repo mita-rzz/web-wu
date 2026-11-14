@@ -32,3 +32,18 @@ Writeup.php::all()
 Writeup.php::all();
 Writeup::all();
 Writeup::all();
+User::all()
+Writeup::all()
+User::all);
+User::all();
+$u = App\Models\User::find(4);
+$w = App\Models\Writeup::where('author_id', 4)->first();
+dump([
+    'user_id' => [$u?->id, gettype($u?->id)],
+    'author_id' => [$w?->author_id, gettype($w?->author_id)],
+    'status_value' => $u?->status,
+    'status_match' => $u?->status === App\Enums\UserStatus::Active,
+    'id_strict_match' => $w?->author_id === $u?->id,
+    'policy_registered' => Illuminate\Support\Facades\Gate::getPolicyFor(App\Models\Writeup::class),
+    'can_update' => $u?->can('update', $w),
+]);

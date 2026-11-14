@@ -46,3 +46,27 @@
         transition: none;
     }
 }
+
+/* Titik hijau berkedip di samping username (header). */
+@keyframes blink-green {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 8px 2px rgba(16, 185, 129, 0.85);
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.25;
+        box-shadow: 0 0 2px 0 rgba(16, 185, 129, 0.15);
+        transform: scale(0.85);
+    }
+}
+
+.blink-green-light {
+    animation: blink-green 1.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .blink-green-light {
+        animation: none;
+    }
+}
