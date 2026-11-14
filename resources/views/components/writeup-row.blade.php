@@ -18,7 +18,7 @@
     $itemMenu = 'flex min-h-[44px] w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent';
 @endphp
 
-{{-- Judul bukan tautan: halaman detail belum ada (di luar cakupan). --}}
+{{-- Judul adalah tautan ke halaman detail; menu titik tiga di luar tautan. --}}
 <article role="listitem"
          x-data="{ open: false }"
          :class="open ? 'z-30' : ''"
@@ -34,7 +34,10 @@
             <span class="text-xs text-textSec">· {{ $tanggal }}</span>
         </div>
 
-        <h2 class="break-words text-base font-semibold leading-snug text-textMain md:text-lg">{{ $writeup->title }}</h2>
+        <h2 class="break-words text-base font-semibold leading-snug text-textMain md:text-lg">
+            <a href="{{ route('writeups.show', $writeup) }}"
+               class="rounded transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent">{{ $writeup->title }}</a>
+        </h2>
 
         @if ($writeup->tags->isNotEmpty())
             <div class="mt-2.5 flex flex-wrap items-center gap-2.5">

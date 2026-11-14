@@ -32,6 +32,10 @@ Route::middleware('auth')->group(function () {
         ->name('writeups.media.store');
 });
 
+// Publik (tamu boleh); sengaja SETELAH grup auth agar /writeups/create tetap menang.
+// Otorisasi draft di WriteupController::show() lewat WriteupPolicy::view().
+Route::get('/writeups/{writeup}', [WriteupController::class, 'show'])->name('writeups.show');
+
 Route::get('/test', function () {
     return view('dashboard');
 })->name('test');

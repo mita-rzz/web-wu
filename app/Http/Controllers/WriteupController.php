@@ -15,12 +15,17 @@ use App\Models\Tag;
 use App\Models\Tool;
 use App\Models\User;
 use App\Models\Writeup;
+use DOMDocument;
+use DOMElement;
+use DOMNode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -89,6 +94,135 @@ class WriteupController extends Controller
                 'level' => $level?->value,
             ],
         ]);
+    }
+
+    /**
+     * Halaman detail write-up (publik). Draft/terjadwal hanya untuk penulisnya;
+     * selain itu 404 (bukan 403) supaya keberadaan draft tidak bocor.
+     * Write-up yang di-soft-delete sudah 404 lewat route model binding.
+     */
+    public function show(Writeup $writeup): View
+    {
+        abort_unless(Gate::allows('view', $writeup), 404);
+
+        $writeup->load([
+            'author:id,username,display_name',
+            'category:id,name,slug',
+            'tags' => fn ($q) => $q->select('tags.id', 'tags.name')->orderBy('tags.name'),
+            'tools' => fn ($q) => $q->select('tools.id', 'tools.name')->orderBy('tools.name'),
+            'mediaUploads:id,writeup_id,original_name,file_path',
+        ]);
+
+        ['html' => $bodyHtml, 'gambar' => $gambar] = $this->renderMarkdown($writeup->content_md, $writeup->mediaUploads);
+
+        return view('writeups.show', [
+            'writeup' => $writeup,
+            'bodyHtml' => $bodyHtml,
+            'gambar' => $gambar,
+        ]);
+    }
+
+    /**
+     * Markdown -> HTML aman. Gambar dipindah keluar dari badan (ditampilkan sebagai galeri),
+     * tautan eksternal diberi target/rel. Hasil `html` satu-satunya yang boleh dicetak dengan {!! !!}.
+     *
+     * @param  Collection<int, MediaUpload>  $media
+     * @return array{html: string, gambar: list<array{url: string, caption: string, nama_file: string}>}
+     */
+    private function renderMarkdown(string $markdown, Collection $media): array
+    {
+        $html = Str::markdown($markdown, ['html_input' => 'strip', 'allow_unsafe_links' => false]);
+
+        if (trim($html) === '') {
+            return ['html' => '', 'gambar' => []];
+        }
+
+        // meta charset memaksa libxml membaca string sebagai UTF-8.
+        $dom = new DOMDocument;
+        $sebelumnya = libxml_use_internal_errors(true);
+        $dom->loadHTML(
+            '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="akar">'.$html.'</div></body></html>',
+            LIBXML_NONET,
+        );
+        libxml_clear_errors();
+        libxml_use_internal_errors($sebelumnya);
+
+        $akar = $dom->getElementById('akar');
+
+        if ($akar === null) {
+            return ['html' => '', 'gambar' => []];
+        }
+
+        $gambar = [];
+
+        // Salin ke array dulu: NodeList hidup berubah saat node dihapus.
+        foreach (iterator_to_array($dom->getElementsByTagName('img')) as $img) {
+            $src = trim($img->getAttribute('src'));
+            $alt = trim($img->getAttribute('alt'));
+
+            $this->hapusDenganInduk($img, $akar);
+
+            // Hanya http(s) atau path lokal diawali "/" (bukan "//" atau "/\" yang menunjuk host lain).
+            if (! $this->srcGambarAman($src)) {
+                continue;
+            }
+
+            $cocok = $media->first(fn (MediaUpload $m): bool => $m->file_path !== '' && str_contains($src, $m->file_path));
+
+            $gambar[] = [
+                'url' => $src,
+                'caption' => $alt,
+                'nama_file' => $cocok?->original_name ?? '',
+            ];
+        }
+
+        $hostApp = request()->getHost();
+
+        foreach ($dom->getElementsByTagName('a') as $a) {
+            $host = parse_url($a->getAttribute('href'), PHP_URL_HOST);
+
+            if (preg_match('#^https?://#i', $a->getAttribute('href')) === 1 && $host !== $hostApp) {
+                $a->setAttribute('target', '_blank');
+                $a->setAttribute('rel', 'noopener noreferrer');
+            }
+        }
+
+        $hasil = '';
+
+        foreach ($akar->childNodes as $anak) {
+            $hasil .= $dom->saveHTML($anak);
+        }
+
+        return ['html' => $hasil, 'gambar' => $gambar];
+    }
+
+    private function srcGambarAman(string $src): bool
+    {
+        if (preg_match('#^https?://[^\s/]#i', $src) === 1) {
+            return true;
+        }
+
+        return str_starts_with($src, '/') && ! str_starts_with($src, '//') && ! str_starts_with($src, '/\\');
+    }
+
+    /**
+     * Hapus node, lalu hapus pula pembungkus inline/paragraf yang jadi kosong
+     * (mis. <p><img></p> atau <a><img></a>).
+     */
+    private function hapusDenganInduk(DOMNode $node, DOMElement $akar): void
+    {
+        $induk = $node->parentNode;
+        $induk?->removeChild($node);
+
+        while ($induk instanceof DOMElement
+            && ! $induk->isSameNode($akar)
+            && in_array($induk->nodeName, ['p', 'a', 'em', 'strong'], true)
+            && trim($induk->textContent) === ''
+            && $induk->getElementsByTagName('img')->length === 0) {
+            $atas = $induk->parentNode;
+            $atas?->removeChild($induk);
+            $induk = $atas;
+        }
     }
 
     /**

@@ -70,3 +70,89 @@
         animation: none;
     }
 }
+
+/*
+ * Badan write-up (HTML hasil render Markdown di halaman detail).
+ * Tanpa @tailwindcss/typography: elemen diberi gaya langsung lewat selector turunan.
+ */
+@layer components {
+    .prose-solvelog {
+        @apply space-y-6 break-words;
+    }
+
+    .prose-solvelog p {
+        @apply text-base leading-7 text-textSec;
+    }
+
+    .prose-solvelog h1,
+    .prose-solvelog h2 {
+        @apply pt-2 text-lg font-semibold text-textMain sm:text-xl;
+    }
+
+    .prose-solvelog h3,
+    .prose-solvelog h4,
+    .prose-solvelog h5,
+    .prose-solvelog h6 {
+        @apply font-semibold text-textMain;
+    }
+
+    .prose-solvelog strong {
+        @apply text-textMain;
+    }
+
+    .prose-solvelog a {
+        @apply text-accent hover:underline;
+    }
+
+    .prose-solvelog ul {
+        @apply list-disc pl-6 text-textSec marker:text-textSec;
+    }
+
+    .prose-solvelog ol {
+        @apply list-decimal pl-6 text-textSec marker:text-textSec;
+    }
+
+    .prose-solvelog li {
+        @apply leading-7;
+    }
+
+    .prose-solvelog li > ul,
+    .prose-solvelog li > ol {
+        @apply mt-2;
+    }
+
+    .prose-solvelog code {
+        @apply rounded border border-borderMain bg-panel px-1.5 py-0.5 font-mono text-textMain;
+    }
+
+    .prose-solvelog pre {
+        @apply overflow-x-auto rounded-xl border border-borderMain bg-panel p-4 font-mono text-sm;
+    }
+
+    /* Kode di dalam blok pre tidak perlu kotak sendiri. */
+    .prose-solvelog pre code {
+        @apply rounded-none border-0 bg-transparent p-0;
+    }
+
+    .prose-solvelog blockquote {
+        @apply border-l-2 border-accent pl-4;
+    }
+
+    .prose-solvelog hr {
+        @apply border-borderMain;
+    }
+
+    /* Tabel scroll di dalam wadahnya sendiri; halaman tidak ikut bergeser. */
+    .prose-solvelog table {
+        @apply block max-w-full overflow-x-auto text-sm text-textSec;
+    }
+
+    .prose-solvelog th,
+    .prose-solvelog td {
+        @apply border border-borderMain px-3 py-2 text-left;
+    }
+
+    .prose-solvelog th {
+        @apply font-semibold text-textMain;
+    }
+}

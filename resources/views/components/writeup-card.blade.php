@@ -32,9 +32,9 @@
     $tanggal = ($writeup->published_at ?? $writeup->created_at)?->locale('id')->translatedFormat('d M Y');
 @endphp
 
-{{-- Belum ada halaman detail (di luar cakupan), jadi kartu bukan tautan. --}}
-<article tabindex="0"
-         class="group z-10 flex flex-col rounded-xl border border-borderMain bg-panel p-5 outline-none transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:z-20 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus:ring-2 {{ $warna['card'] }}">
+{{-- Seluruh kartu adalah tautan ke halaman detail write-up. --}}
+<a href="{{ route('writeups.show', $writeup) }}"
+   class="group z-10 flex flex-col rounded-xl border border-borderMain bg-panel p-5 outline-none transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:z-20 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus:ring-2 {{ $warna['card'] }}">
     <div class="mb-3 flex items-start justify-between">
         <span class="text-xs font-semibold uppercase tracking-wider text-textSec">{{ $writeup->category->name }}</span>
         <div class="flex items-center gap-1.5">
@@ -65,4 +65,4 @@
         <span class="text-textMain">{{ $writeup->author->username }}</span>
         <span>{{ $tanggal }}</span>
     </div>
-</article>
+</a>
