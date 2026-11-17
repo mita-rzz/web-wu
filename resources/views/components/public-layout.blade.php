@@ -3,6 +3,8 @@
 @php
     // Gaya tombol "Postingan Saya": aktif bila sedang di halamannya.
     $mineAktif = request()->routeIs('writeups.mine');
+    // Username di header menuju profil; aktif di semua route profile.*.
+    $profilAktif = request()->routeIs('profile.*');
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -46,10 +48,11 @@
 
                     <div class="ml-4 flex items-center gap-3 border-l border-borderMain pl-4">
                         @auth
-                            <span class="inline-flex items-center gap-2 text-sm font-medium text-textMain" title="{{ Auth::user()->display_name }}">
+                            <a href="{{ route('profile.edit') }}" @if ($profilAktif) aria-current="page" @endif title="{{ Auth::user()->display_name }}"
+                               class="inline-flex items-center gap-2 rounded text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent {{ $profilAktif ? 'text-accent' : 'text-textMain hover:text-accent' }}">
                                 <span class="h-2 w-2 rounded-full bg-accent blink-green-light" aria-hidden="true"></span>
                                 {{ Auth::user()->username }}
-                            </span>
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="rounded text-sm text-textSec hover:text-textMain focus:outline-none focus:ring-2 focus:ring-accent">Logout</button>
@@ -63,10 +66,11 @@
                 {{-- Akun mobile (baris 1) --}}
                 <div class="flex items-center gap-3 md:hidden">
                     @auth
-                        <span class="inline-flex items-center gap-1.5 text-sm font-medium text-textMain" title="{{ Auth::user()->display_name }}">
+                        <a href="{{ route('profile.edit') }}" @if ($profilAktif) aria-current="page" @endif title="{{ Auth::user()->display_name }}"
+                           class="inline-flex items-center gap-1.5 rounded text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent {{ $profilAktif ? 'text-accent' : 'text-textMain hover:text-accent' }}">
                             <span class="h-2 w-2 rounded-full bg-accent blink-green-light" aria-hidden="true"></span>
                             {{ Auth::user()->username }}
-                        </span>
+                        </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="text-sm text-textSec hover:text-textMain">Logout</button>

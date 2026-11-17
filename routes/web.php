@@ -10,8 +10,12 @@ Route::redirect('/dashboard', '/');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->middleware('throttle:10,1')
+        ->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->middleware('throttle:5,1') // batasi tebakan password
+        ->name('profile.destroy');
 
     Route::get('/postingan-saya', [WriteupController::class, 'mine'])->name('writeups.mine');
 
