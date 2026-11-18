@@ -1,3 +1,4 @@
+@props(['glow' => false])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -15,10 +16,16 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-page text-gray-50">
+    @if ($glow)
+        {{-- Efek grid + glow yang mengikuti kursor (CSS di app.css, posisi dari app.js).
+             Disembunyikan di layar sentuh dan bila pengguna memilih prefers-reduced-motion. --}}
+        <div class="ambient-glow motion-reduce:hidden [@media(hover:none)]:hidden" aria-hidden="true"></div>
+        <div class="glow-grid motion-reduce:hidden [@media(hover:none)]:hidden" aria-hidden="true"></div>
+    @endif
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-sm rounded-2xl border border-line bg-surface p-8 shadow-2xl shadow-black/40">
             <a href="/" class="flex justify-center">
-                <x-application-logo class="h-9 w-9 fill-current text-gray-50" />
+                <x-application-logo />
             </a>
 
             @isset($heading)

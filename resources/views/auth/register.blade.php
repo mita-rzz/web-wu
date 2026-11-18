@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout :glow="true">
     <x-slot name="heading">
         <h1 class="text-lg font-semibold text-gray-50">Create an account</h1>
         <p class="mt-1 text-xs text-gray-400">Enter your details below to create your account</p>
