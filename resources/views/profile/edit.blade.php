@@ -107,6 +107,10 @@
             <section class="rounded-xl border border-borderMain bg-panel p-5 sm:p-6">
                 @include('profile.partials.update-password-form')
             </section>
+
+            <section class="rounded-xl border border-red-500/30 bg-panel p-5 sm:p-6">
+                @include('profile.partials.delete-user-form')
+            </section>
         </div>
     </div>
 </x-public-layout>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Closure;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,7 +32,25 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'username' => ['required', 'string', 'max:255'],
+            'username' => [
+                'bail',
+                'required',
+                'string',
+                'min:3',
+                'max:50',
+                'regex:/^[A-Za-z0-9_.-]+$/',
+                'unique:'.User::class,
+                // Unik tanpa memperhatikan huruf besar/kecil (SQLite membedakan, MySQL tidak).
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    $sudahAda = User::query()
+                        ->whereRaw('lower(username) = ?', [mb_strtolower($value)])
+                        ->exists();
+
+                    if ($sudahAda) {
+                        $fail('Username sudah dipakai.');
+                    }
+                },
+            ],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);

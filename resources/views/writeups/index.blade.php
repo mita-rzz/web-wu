@@ -76,8 +76,10 @@
   
 
     <div class="pb-24">
+        <p class="mt-6 text-sm text-textSec">{{ $writeups->total() }} write-up</p>
+
         @if ($writeups->isNotEmpty())
-            <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
+            <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
                 @foreach ($writeups as $writeup)
                     <x-writeup-card :writeup="$writeup" :excerpt="$excerpts[$writeup->id]" />
                 @endforeach
