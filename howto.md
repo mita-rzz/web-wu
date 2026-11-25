@@ -11,7 +11,7 @@ docker compose -f compose.dev.yaml up -d --build
 docker compose -f compose.dev.yaml exec app php artisan migrate
 ```
 
-- memeriksa lingkungan (environment) aplikasi kamu saat ini
+- memeriksa lingkungan (environment) aplikasi saat ini
 
 ```
 docker compose -f compose.dev.yaml exec app php artisan env
@@ -44,4 +44,4 @@ docker compose -f compose.dev.yaml exec app rm -f public/hot
 docker compose -f compose.dev.yaml exec node npm run build
 ```
 
-git archive --format=zip --output=../v18.zip HEAD
+git archive --format=zip --output=../v19.zip HEAD
