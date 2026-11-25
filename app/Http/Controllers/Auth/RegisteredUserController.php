@@ -40,7 +40,6 @@ class RegisteredUserController extends Controller
                 'max:50',
                 'regex:/^[A-Za-z0-9_.-]+$/',
                 'unique:'.User::class,
-                // Unik tanpa memperhatikan huruf besar/kecil (SQLite membedakan, MySQL tidak).
                 function (string $attribute, mixed $value, Closure $fail): void {
                     $sudahAda = User::query()
                         ->whereRaw('lower(username) = ?', [mb_strtolower($value)])

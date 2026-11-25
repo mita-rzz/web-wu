@@ -17,19 +17,12 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Jumlah write-up terbaru pada tab Ringkasan.
-     */
     private const TERBARU = 5;
 
-    /**
-     * Halaman profil: ringkasan + pengaturan akun.
-     */
     public function edit(Request $request): View
     {
         $user = $request->user();
 
-        // Satu query ber-group; jumlah terbit = jumlah semua level.
         $perLevel = array_fill_keys(array_column(WriteupDifficulty::cases(), 'value'), 0);
 
         Writeup::published()
@@ -57,15 +50,10 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Ubah username, nama tampilan, bio, dan email.
-     * role/status tidak pernah diambil dari input.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
 
-        // current_password hanya untuk validasi; tidak disimpan.
         $user->fill(Arr::only($request->validated(), ['username', 'display_name', 'bio', 'email']));
 
         if ($user->isDirty('email')) {
@@ -77,10 +65,6 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit')->with('status', 'Profil berhasil diperbarui.');
     }
 
-    /**
-     * Hapus akun. Ditolak bila masih punya write-up (termasuk yang di-soft-delete)
-     * atau media, karena FK-nya restrictOnDelete.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
@@ -108,9 +92,6 @@ class ProfileController extends Controller
         return redirect('/');
     }
 
-    /**
-     * Apakah user masih punya write-up (termasuk soft-deleted) atau media upload.
-     */
     private function punyaKonten(User $user): bool
     {
         return $user->writeups()->withTrashed()->exists() || $user->mediaUploads()->exists();

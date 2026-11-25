@@ -8,17 +8,13 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
+        <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-page text-gray-50">
     @if ($glow)
-        {{-- Efek grid + glow yang mengikuti kursor (CSS di app.css, posisi dari app.js).
-             Disembunyikan di layar sentuh dan bila pengguna memilih prefers-reduced-motion. --}}
         <div class="ambient-glow motion-reduce:hidden [@media(hover:none)]:hidden" aria-hidden="true"></div>
         <div class="glow-grid motion-reduce:hidden [@media(hover:none)]:hidden" aria-hidden="true"></div>
     @endif

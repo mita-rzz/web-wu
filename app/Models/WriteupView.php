@@ -1,5 +1,4 @@
 <?php
-// app/Models/WriteupView.php
 
 declare(strict_types=1);
 

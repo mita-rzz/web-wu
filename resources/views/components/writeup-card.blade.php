@@ -4,7 +4,6 @@
     use App\Enums\WriteupDifficulty;
     use App\Enums\WriteupStatus;
 
-    // Kelas ditulis utuh (bukan dirakit) supaya terdeteksi Tailwind.
     $warna = match ($writeup->difficulty) {
         WriteupDifficulty::Easy => [
             'card' => 'focus:ring-emerald-500 hover:border-emerald-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]',
@@ -28,11 +27,9 @@
         ],
     };
 
-    // Draft belum punya published_at; pakai tanggal dibuat.
     $tanggal = ($writeup->published_at ?? $writeup->created_at)?->locale('id')->translatedFormat('d M Y');
 @endphp
 
-{{-- Seluruh kartu adalah tautan ke halaman detail write-up. --}}
 <a href="{{ route('writeups.show', $writeup) }}"
    class="group z-10 flex flex-col rounded-xl border border-borderMain bg-panel p-5 outline-none transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:z-20 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus:ring-2 {{ $warna['card'] }}">
     <div class="mb-3 flex items-start justify-between">

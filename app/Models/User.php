@@ -37,8 +37,6 @@ class User extends Authenticatable
     protected $table = 'users';
 
     /**
-     * role dan status sengaja tidak mass-assignable.
-     *
      * @var list<string>
      */
     protected $fillable = [

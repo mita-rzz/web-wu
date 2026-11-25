@@ -1,5 +1,4 @@
 <?php
-// app/Models/Tool.php
 
 declare(strict_types=1);
 

@@ -15,16 +15,12 @@ use Throwable;
 class MediaUploadController extends Controller
 {
     /**
-     * Unggah satu gambar untuk disisipkan ke Markdown. writeup_id dibiarkan
-     * null; tautan ke write-up dibuat saat write-up disimpan.
-     *
      * @throws ValidationException
      */
     public function store(StoreMediaUploadRequest $request): JsonResponse
     {
         $file = $request->file('file');
 
-        // Ekstensi ditentukan dari isi file oleh server, bukan dari nama file client.
         $ext = MediaFileExt::tryFrom((string) $file->guessExtension());
 
         if ($ext === null) {
@@ -52,7 +48,6 @@ class MediaUploadController extends Controller
                 'file_size' => (int) $file->getSize(),
             ]);
         } catch (Throwable $e) {
-            // Jangan tinggalkan file yatim jika baris database gagal dibuat.
             $disk->delete($path);
 
             throw $e;

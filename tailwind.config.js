@@ -6,14 +6,13 @@ export default {
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php', // 👉 PASTIKAN BARIS INI ADA
+        './resources/views/**/*.blade.php',
         './resources/js/**/*.js',
     ],
 
     theme: {
         extend: {
             colors: {
-                // Token lama (dipakai halaman lain) — jangan dihapus.
                 page:'#0A0E17',
                 surface: '#111827',
                 line: '#1F2937',
@@ -25,7 +24,6 @@ export default {
                     insane: '#EF4444',
             },
 
-                // Palet dashboard "Arsip Write-Up" (mengikuti arsip_write_up_solvelog.html).
                 bgMain: '#0B1018',
                 panel: '#121B29',
                 borderMain: '#293548',

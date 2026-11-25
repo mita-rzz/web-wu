@@ -6,11 +6,6 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
-/*
- * Efek visual grid + ambient glow: kirim posisi kursor ke CSS variable
- * --mouse-x / --mouse-y (dipakai .ambient-glow dan .glow-grid di app.css).
- * Murni dekoratif; dilewati bila pengguna memilih prefers-reduced-motion.
- */
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let pointerX = 0;
 let pointerY = 0;
@@ -24,7 +19,6 @@ function onMouseMove(event) {
         return;
     }
 
-    // Satu pembaruan per frame supaya ringan.
     frame = window.requestAnimationFrame(() => {
         document.body.style.setProperty('--mouse-x', `${pointerX}px`);
         document.body.style.setProperty('--mouse-y', `${pointerY}px`);

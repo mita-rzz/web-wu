@@ -1,5 +1,4 @@
 @php
-    // Modal hapus dibuka otomatis bila password salah, untuk write-up yang sama.
     $slugGagal = session('hapus_slug');
     $gagal = $errors->writeupDeletion->isNotEmpty() && is_string($slugGagal)
         ? $writeups->firstWhere('slug', $slugGagal)
@@ -29,7 +28,6 @@
                  this.$refs.password.value = '';
                  this.opener?.focus();
              },
-             // Focus trap dasar: Tab berputar di dalam dialog.
              jebak(event) {
                  const fokus = [...this.$refs.dialog.querySelectorAll('input, button, a[href]')].filter((el) => !el.disabled);
                  if (fokus.length === 0) return;
@@ -69,7 +67,6 @@
 
                 {{ $writeups->links('pagination.solvelog') }}
             @else
-                {{-- Empty state --}}
                 <section class="flex flex-col items-center justify-center py-24 text-center">
                     <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-borderMain bg-panel text-textSec">
                         <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -88,7 +85,6 @@
             @endif
         </div>
 
-        {{-- Satu modal hapus untuk seluruh halaman. Sengaja bukan x-modal Breeze (latar putih). --}}
         <div x-show="modal.show" style="display: none"
              @keydown.escape.window="tutup()"
              @keydown.tab="jebak($event)"

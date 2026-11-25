@@ -7,14 +7,10 @@
     body { @apply bg-page text-gray-50; }
 }
 
-/*
- * Efek latar dashboard: grid hijau tipis + cahaya ambient yang mengikuti kursor.
- * Posisi kursor dikirim oleh resources/js/app.js lewat --mouse-x / --mouse-y.
- */
 .ambient-glow {
     position: fixed;
     inset: 0;
-    z-index: -11; /* tepat di bawah grid */
+    z-index: -11;
     pointer-events: none;
     background: radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16, 185, 129, 0.12) 0%, transparent 80%);
     transition: background 0.05s ease-out;
@@ -24,22 +20,19 @@
     position: fixed;
     inset: 0;
     z-index: -10;
-    pointer-events: none; /* tidak menghalangi klik */
+    pointer-events: none;
 
-    /* Kotak-kotak grid emerald tipis */
     background-size: 24px 24px;
     background-image:
         linear-gradient(to right, rgba(16, 185, 129, 0.25) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(16, 185, 129, 0.25) 1px, transparent 1px);
 
-    /* Mask cahaya bulat yang posisinya dinamis dari variabel CSS */
     mask-image: radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 10%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
     -webkit-mask-image: radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 10%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
 
     transition: mask-position 0.05s ease-out, -webkit-mask-position 0.05s ease-out;
 }
 
-/* Pengguna yang meminta gerakan minimal: efek tetap statis di tengah layar. */
 @media (prefers-reduced-motion: reduce) {
     .ambient-glow,
     .glow-grid {
@@ -47,7 +40,6 @@
     }
 }
 
-/* Titik hijau berkedip di samping username (header). */
 @keyframes blink-green {
     0%, 100% {
         opacity: 1;
@@ -71,10 +63,6 @@
     }
 }
 
-/*
- * Badan write-up (HTML hasil render Markdown di halaman detail).
- * Tanpa @tailwindcss/typography: elemen diberi gaya langsung lewat selector turunan.
- */
 @layer components {
     .prose-solvelog {
         @apply space-y-6 break-words;
@@ -129,7 +117,6 @@
         @apply overflow-x-auto rounded-xl border border-borderMain bg-panel p-4 font-mono text-sm;
     }
 
-    /* Kode di dalam blok pre tidak perlu kotak sendiri. */
     .prose-solvelog pre code {
         @apply rounded-none border-0 bg-transparent p-0;
     }
@@ -142,7 +129,6 @@
         @apply border-borderMain;
     }
 
-    /* Tabel scroll di dalam wadahnya sendiri; halaman tidak ikut bergeser. */
     .prose-solvelog table {
         @apply block max-w-full overflow-x-auto text-sm text-textSec;
     }

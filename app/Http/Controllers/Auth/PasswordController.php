@@ -11,9 +11,6 @@ use Illuminate\Validation\Rules\Password;
 
 class PasswordController extends Controller
 {
-    /**
-     * Ganti password user yang sedang login.
-     */
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validateWithBag('updatePassword', [
@@ -27,8 +24,6 @@ class PasswordController extends Controller
             'password.different' => 'Password baru harus berbeda dari password saat ini.',
         ]);
 
-        // Kolomnya password_hash dan tidak fillable; cast "hashed" yang meng-hash nilainya
-        // (jangan Hash::make lagi di sini agar tidak ter-hash dua kali).
         $request->user()->forceFill(['password_hash' => $validated['password']])->save();
 
         return back()->with('status', 'Password berhasil diganti.');

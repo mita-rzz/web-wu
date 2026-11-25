@@ -4,7 +4,6 @@
     use App\Enums\WriteupDifficulty;
     use App\Enums\WriteupStatus;
 
-    // Kelas ditulis utuh (bukan dirakit) supaya terdeteksi Tailwind.
     $badge = match ($writeup->difficulty) {
         WriteupDifficulty::Easy => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
         WriteupDifficulty::Medium => 'bg-amber-500/10 text-amber-400 border-amber-500/25',
@@ -12,13 +11,11 @@
         WriteupDifficulty::Insane => 'bg-purple-500/10 text-purple-400 border-purple-500/25',
     };
 
-    // Draft belum punya published_at; pakai tanggal dibuat.
     $tanggal = ($writeup->published_at ?? $writeup->created_at)?->locale('id')->translatedFormat('d M Y');
 
     $itemMenu = 'flex min-h-[44px] w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent';
 @endphp
 
-{{-- Judul adalah tautan ke halaman detail; menu titik tiga di luar tautan. --}}
 <article role="listitem"
          x-data="{ open: false }"
          :class="open ? 'z-30' : ''"
@@ -48,7 +45,6 @@
         @endif
     </div>
 
-    {{-- Menu titik tiga --}}
     <div class="relative shrink-0 self-center" @click.outside="open = false">
         <button type="button" x-ref="tombol"
                 @click="open = !open; if (open) $nextTick(() => $refs.menu.querySelector('[role=menuitem]')?.focus())"

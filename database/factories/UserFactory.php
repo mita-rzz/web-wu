@@ -24,9 +24,7 @@ class UserFactory extends Factory
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
             'display_name' => fake()->name(),
-            // Cast "hashed" pada model meng-hash nilai ini; jangan Hash::make lagi.
             'password_hash' => 'password',
-            // role dan status tidak mass-assignable; factory membuat model tanpa guard.
             'role' => UserRole::Author,
             'status' => UserStatus::Active,
             'email_verified_at' => now(),

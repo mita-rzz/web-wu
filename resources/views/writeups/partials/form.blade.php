@@ -1,11 +1,9 @@
 @php
-    // $writeup null = halaman create; terisi = halaman edit. old() selalu mengalahkan database.
     $writeup ??= null;
     $label = 'text-xs font-semibold uppercase tracking-wider text-accent';
     $field = 'block w-full rounded-lg border-line bg-page text-sm text-gray-50 placeholder-gray-500 shadow-none focus:border-gray-200 focus:ring-1 focus:ring-gray-200';
     $chip  = 'inline-flex h-8 cursor-pointer select-none items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm text-gray-300 transition hover:border-accent hover:text-accent-soft peer-checked:border-accent peer-checked:text-accent-soft peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-disabled:cursor-not-allowed peer-disabled:opacity-40 peer-disabled:hover:border-line peer-disabled:hover:text-gray-300';
 
-    // Kelas ditulis utuh supaya terbaca oleh Tailwind.
     $levelClass = [
         'easy'   => ['dot' => 'bg-level-easy',   'on' => 'peer-checked:!border-level-easy'],
         'medium' => ['dot' => 'bg-level-medium', 'on' => 'peer-checked:!border-level-medium'],
@@ -26,7 +24,6 @@
         array_filter((array) old($name, []), 'is_scalar'),
     ));
 
-    // Setelah gagal validasi, pilihan dari old() dipakai apa adanya (termasuk "tidak ada yang dicentang").
     $selectedIds = fn (string $name): array => $writeup !== null && ! session()->hasOldInput()
         ? $writeup->{$name}->pluck('id')->map(fn ($id): string => (string) $id)->all()
         : $oldIds($name);
@@ -43,7 +40,6 @@
         @method('PUT')
     @endif
 
-    {{-- JUDUL --}}
     <div>
         <x-input-label for="title" value="Judul" />
         <x-text-input id="title" class="mt-1.5" type="text" name="title" :value="$nilaiJudul"
@@ -51,7 +47,6 @@
         <x-input-error :messages="$errors->get('title')" :class="$errorClass" />
     </div>
 
-    {{-- KATEGORI --}}
     <div>
         <x-input-label for="category_id" value="Kategori" />
         <select id="category_id" name="category_id" required class="{{ $field }} mt-1.5">
@@ -65,7 +60,6 @@
         <x-input-error :messages="$errors->get('category_id')" :class="$errorClass" />
     </div>
 
-    {{-- TINGKAT KESULITAN --}}
     <fieldset>
         <legend class="block text-xs font-semibold text-gray-50">Tingkat kesulitan</legend>
         <div class="mt-2 flex flex-wrap gap-2">
@@ -84,7 +78,6 @@
         <x-input-error :messages="$errors->get('difficulty')" :class="$errorClass" />
     </fieldset>
 
-    {{-- TAG DAN TOOL (maksimal 10 masing-masing) --}}
     @foreach ([
         ['name' => 'tags', 'legend' => 'Tag', 'items' => $tags],
         ['name' => 'tools', 'legend' => 'Tool', 'items' => $tools],
@@ -110,7 +103,6 @@
         </fieldset>
     @endforeach
 
-    {{-- ISI MARKDOWN + UNGGAH GAMBAR --}}
     <div x-data="{
             uploading: false,
             uploadError: '',
@@ -192,7 +184,6 @@
         <x-input-error :messages="$errors->get('content_md')" :class="$errorClass" />
     </div>
 
-    {{-- AKSI: tombol pertama menjadi default saat menekan Enter --}}
     @php
         $tombolSekunder = 'inline-flex items-center justify-center rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent';
     @endphp

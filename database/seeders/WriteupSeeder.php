@@ -73,7 +73,6 @@ class WriteupSeeder extends Seeder
             ],
         ];
 
-        // Data tambahan supaya paginasi dan filter bisa diuji (12 per halaman).
         $categories = ['web', 'crypto', 'pwn', 'forensics', 'mobile', 'reverse'];
         $difficulties = [WriteupDifficulty::Easy, WriteupDifficulty::Medium, WriteupDifficulty::Hard, WriteupDifficulty::Insane];
         $tagSlugs = ['sql-injection', 'xss', 'idor', 'ssrf', 'rce', 'lfi', 'jwt', 'rsa', 'buffer-overflow', 'packet-analysis'];
@@ -111,7 +110,6 @@ class WriteupSeeder extends Seeder
             $writeup->tags()->sync(Tag::whereIn('slug', $data['tags'])->pluck('id'));
             $writeup->tools()->sync(Tool::whereIn('slug', $data['tools'])->pluck('id'));
 
-            // Data statistik contoh, hanya jika write-up published belum punya catatan view.
             if ($writeup->status === WriteupStatus::Published && ! $writeup->views()->exists()) {
                 $rows = [];
 

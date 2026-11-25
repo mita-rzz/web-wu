@@ -33,8 +33,6 @@ class WriteupCreateTest extends TestCase
         Storage::fake('public');
     }
 
-    // --- Akses ---------------------------------------------------------
-
     public function test_tamu_diarahkan_ke_login_saat_membuka_form(): void
     {
         $this->get('/writeups/create')->assertRedirect(route('login'));
@@ -97,8 +95,6 @@ class WriteupCreateTest extends TestCase
 
         $this->assertSame(0, Writeup::query()->count());
     }
-
-    // --- Penyimpanan ---------------------------------------------------
 
     public function test_user_aktif_bisa_menyimpan_draft(): void
     {
@@ -212,8 +208,6 @@ class WriteupCreateTest extends TestCase
         $this->assertTrue($kedua->published_at->isAfter(now()->subMinute()));
     }
 
-    // --- Slug ----------------------------------------------------------
-
     public function test_judul_kembar_menghasilkan_slug_unik(): void
     {
         $user = $this->buatUser();
@@ -249,7 +243,6 @@ class WriteupCreateTest extends TestCase
     {
         $user = $this->buatUser();
 
-        // "Æ" menjadi "ae" saat di-slug, jadi 200 karakter judul menghasilkan slug 400 karakter.
         foreach ([str_repeat('a', 200), str_repeat('Æ', 200)] as $judul) {
             foreach (range(1, 3) as $_) {
                 $this->actingAs($user)
@@ -276,8 +269,6 @@ class WriteupCreateTest extends TestCase
 
         $this->assertSame('writeup', Writeup::query()->firstOrFail()->slug);
     }
-
-    // --- Validasi ------------------------------------------------------
 
     /**
      * @return array<string, array{array<string, mixed>, string}>
@@ -337,7 +328,6 @@ class WriteupCreateTest extends TestCase
 
         $this->assertSame(0, Writeup::query()->count());
 
-        // Tepat 10 masih boleh.
         $this->actingAs($user)
             ->post(route('writeups.store'), $this->dataWriteup(['tags' => Tag::query()->limit(10)->pluck('id')->all()]))
             ->assertSessionHasNoErrors();
@@ -347,7 +337,6 @@ class WriteupCreateTest extends TestCase
 
     public function test_input_lama_dipertahankan_dan_error_tampil_di_form(): void
     {
-        // Mengikuti redirect seperti browser: kembali ke form dengan error dan old().
         $this->actingAs($this->buatUser())
             ->from(route('writeups.create'))
             ->followingRedirects()
@@ -364,8 +353,6 @@ class WriteupCreateTest extends TestCase
         $this->assertSame(0, Writeup::query()->count());
     }
 
-    // --- Media ---------------------------------------------------------
-
     public function test_media_yang_dipakai_di_content_md_tertaut_ke_write_up(): void
     {
         $user = $this->buatUser();
@@ -380,7 +367,6 @@ class WriteupCreateTest extends TestCase
             ->assertCreated()
             ->json();
 
-        // Media milik user lain yang pathnya dikutip tetap tidak boleh ikut tertaut.
         $milikOrangLain = MediaUpload::query()->create([
             'uploader_id' => $orangLain->id,
             'original_name' => 'x.png',

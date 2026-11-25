@@ -52,18 +52,12 @@ class WriteupManageTest extends TestCase
         ], $atribut));
     }
 
-    /**
-     * Apakah checkbox tag/tool dengan id tertentu bertanda "checked". Dicari hanya di dalam
-     * tag <input> (sampai <span> chip), karena kelas "peer-checked:" juga memuat kata checked.
-     */
     private function pilihanTercentang(string $html, string $nama, int $id): bool
     {
         return preg_match('/name="'.$nama.'\[\]" value="'.$id.'"(?:(?!<span).)*?\schecked(?=[\s>])/s', $html) === 1;
     }
 
     /**
-     * Data form update yang valid; $override menimpa sebagian.
-     *
      * @param  array<string, mixed>  $override
      * @return array<string, mixed>
      */
@@ -74,8 +68,6 @@ class WriteupManageTest extends TestCase
             'status' => 'published',
         ], $override));
     }
-
-    // --- Tamu --------------------------------------------------------------
 
     public function test_tamu_ditolak_di_semua_rute_kelola(): void
     {
@@ -89,8 +81,6 @@ class WriteupManageTest extends TestCase
         $this->assertNotSoftDeleted($writeup);
         $this->assertSame('Punya Penulis', $writeup->fresh()->title);
     }
-
-    // --- Halaman Postingan Saya --------------------------------------------
 
     public function test_mine_hanya_menampilkan_milik_sendiri_termasuk_draft(): void
     {
@@ -109,7 +99,6 @@ class WriteupManageTest extends TestCase
             ->assertSee('Draft</span>', false)
             ->assertDontSee('Punya Orang Lain')
             ->assertDontSee('Draft Orang Lain')
-            // Tanpa ringkasan, dan judul bukan tautan.
             ->assertDontSee('Isi awal untuk')
             ->assertSee('Update')
             ->assertSee('Delete');
@@ -164,8 +153,6 @@ class WriteupManageTest extends TestCase
         $this->actingAs($user)->get('/')->assertDontSee('aria-current="page"', false);
     }
 
-    // --- Halaman edit ------------------------------------------------------
-
     public function test_pemilik_bisa_membuka_edit_dan_form_terisi(): void
     {
         $saya = $this->buatUser();
@@ -188,7 +175,7 @@ class WriteupManageTest extends TestCase
             ->assertSee('name="_method" value="PUT"', false)
             ->assertSee('value="Judul Awal Edit"', false)
             ->assertSee('Konten markdown awal.')
-            ->assertSee('Sisipkan gambar') // unggah gambar tetap ada
+            ->assertSee('Sisipkan gambar')
             ->assertSee('Simpan perubahan')
             ->assertSee('Jadikan draft')
             ->assertDontSee('Simpan sebagai draft')
@@ -199,7 +186,6 @@ class WriteupManageTest extends TestCase
         $this->assertTrue($this->pilihanTercentang($html, 'tags', $tag->id));
         $this->assertTrue($this->pilihanTercentang($html, 'tools', $tool->id));
 
-        // Kontrol negatif: pilihan lain tidak tercentang, jadi pemeriksaannya memang membedakan.
         $this->assertFalse($this->pilihanTercentang($html, 'tags', Tag::where('slug', 'idor')->value('id')));
         $this->assertFalse($this->pilihanTercentang($html, 'tools', Tool::where('slug', 'ffuf')->value('id')));
     }
@@ -225,8 +211,6 @@ class WriteupManageTest extends TestCase
 
         $this->actingAs($saya)->get(route('writeups.edit', $writeup))->assertNotFound();
     }
-
-    // --- Otorisasi ---------------------------------------------------------
 
     public function test_user_lain_mendapat_403_di_edit_update_dan_destroy(): void
     {
@@ -254,8 +238,6 @@ class WriteupManageTest extends TestCase
         $this->assertSame('Milik Terblokir', $writeup->fresh()->title);
     }
 
-    // --- Update ------------------------------------------------------------
-
     public function test_update_valid_mengubah_field_sync_tag_dan_tool_serta_slug_tetap(): void
     {
         $saya = $this->buatUser();
@@ -281,7 +263,7 @@ class WriteupManageTest extends TestCase
 
         $baru = $writeup->fresh();
         $this->assertSame('Judul Sesudah Diubah', $baru->title);
-        $this->assertSame($slugAwal, $baru->slug); // URL stabil
+        $this->assertSame($slugAwal, $baru->slug);
         $this->assertSame($kategoriBaru, $baru->category_id);
         $this->assertSame(WriteupDifficulty::Insane, $baru->difficulty);
         $this->assertSame('Isi baru yang lengkap.', $baru->content_md);
@@ -329,7 +311,6 @@ class WriteupManageTest extends TestCase
         $writeup->tags()->sync([Tag::where('slug', 'xss')->value('id')]);
         $edit = route('writeups.edit', $writeup);
 
-        // Alur nyata: kirim form tidak valid, ikuti redirect kembali ke halaman edit.
         $html = $this->actingAs($saya)->from($edit)->followingRedirects()
             ->put(route('writeups.update', $writeup), $this->dataUpdate([
                 'title' => 'Judul Dari Input Gagal',
@@ -344,7 +325,6 @@ class WriteupManageTest extends TestCase
             ->assertDontSee('value="Judul Di Database"', false)
             ->getContent();
 
-        // old() dipakai apa adanya, termasuk tag yang sengaja dikosongkan.
         $this->assertFalse($this->pilihanTercentang($html, 'tags', Tag::where('slug', 'xss')->value('id')));
     }
 
@@ -363,8 +343,6 @@ class WriteupManageTest extends TestCase
         $this->assertSame('slug-harus-tetap', $baru->slug);
         $this->assertSame($saya->id, $baru->author_id);
     }
-
-    // --- Transisi published_at --------------------------------------------
 
     public function test_draft_ke_published_mengisi_published_at(): void
     {
@@ -407,8 +385,6 @@ class WriteupManageTest extends TestCase
         $this->assertFalse(Writeup::published()->whereKey($baru->id)->exists());
     }
 
-    // --- Delete dengan password -------------------------------------------
-
     public function test_destroy_tanpa_password_gagal_dan_data_masih_ada(): void
     {
         $saya = $this->buatUser();
@@ -443,7 +419,6 @@ class WriteupManageTest extends TestCase
         $writeup = $this->buatWriteup($saya, 'Tetap Aman');
         $lain = $this->buatWriteup($saya, 'Tulisan Lain Lagi');
 
-        // Alur nyata: kirim password salah, ikuti redirect ke halaman daftar.
         $this->actingAs($saya)->from(route('writeups.mine'))->followingRedirects()
             ->delete(route('writeups.destroy', $writeup), ['password' => 'password-salah'])
             ->assertOk()
@@ -483,7 +458,6 @@ class WriteupManageTest extends TestCase
             ->assertSessionHas('status', 'Write-up berhasil dihapus.');
 
         $this->assertSoftDeleted($writeup);
-        // Baris tetap ada di tabel supaya slug tidak dipakai ulang.
         $this->assertTrue(Writeup::withTrashed()->where('slug', $writeup->slug)->exists());
 
         $this->get('/')->assertDontSee('Akan Dihapus');
@@ -500,7 +474,6 @@ class WriteupManageTest extends TestCase
                 ->assertSessionHasErrors(['password'], errorBag: 'writeupDeletion');
         }
 
-        // Percobaan ke-6 ditolak, walau password-nya benar.
         $this->actingAs($saya)->delete(route('writeups.destroy', $writeup), ['password' => 'password'])
             ->assertStatus(429);
 

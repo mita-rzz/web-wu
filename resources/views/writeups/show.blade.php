@@ -2,7 +2,6 @@
     use App\Enums\WriteupDifficulty;
     use App\Enums\WriteupStatus;
 
-    // Kelas ditulis utuh (bukan dirakit) supaya terdeteksi Tailwind.
     $badge = match ($writeup->difficulty) {
         WriteupDifficulty::Easy => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
         WriteupDifficulty::Medium => 'bg-amber-500/10 text-amber-400 border-amber-500/25',
@@ -14,10 +13,8 @@
 @endphp
 
 <x-public-layout :title="$writeup->title.' - SolveLog'">
-    {{-- <main> sudah disediakan layout; kelasnya sama dengan acuan, dipasang pada div. --}}
     <div class="mx-auto max-w-3xl px-2 pb-28 pt-10 sm:px-6 md:pt-14">
 
-        {{-- Tautan kembali --}}
         <div class="mb-7">
             <a href="{{ route('dashboard') }}"
                class="inline-flex items-center gap-1.5 rounded text-sm text-textSec transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent">
@@ -99,7 +96,6 @@
                 </div>
             @endif
 
-            {{-- HTML hasil sanitasi WriteupController::renderMarkdown(); satu-satunya {!! !!} di halaman ini. --}}
             <div class="prose-solvelog mt-8">{!! $bodyHtml !!}</div>
         </article>
     </div>

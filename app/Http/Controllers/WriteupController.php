@@ -32,40 +32,22 @@ use Illuminate\View\View;
 
 class WriteupController extends Controller
 {
-    /**
-     * Panjang maksimal kolom writeups.slug.
-     */
     private const SLUG_MAX_LENGTH = 220;
 
-    /**
-     * Jumlah percobaan ulang bila dua request menghasilkan slug yang sama bersamaan.
-     */
     private const SLUG_ATTEMPTS = 3;
 
-    /**
-     * Jumlah write-up per halaman pada dashboard.
-     */
     private const PER_PAGE = 12;
 
-    /**
-     * Batas panjang kata kunci pencarian.
-     */
     private const SEARCH_MAX_LENGTH = 100;
 
-    /**
-     * Dashboard "Arsip Write-Up": daftar write-up + pencarian dan filter di server.
-     */
     public function index(Request $request): View|RedirectResponse
     {
-        // Tab "saya" sudah dipindah ke halaman sendiri; tautan lama tetap berfungsi.
-        // Tamu langsung ke login (bukan lewat redirect ganda).
         if ($this->queryString($request, 'tab') === 'saya') {
             return $request->user() === null
                 ? redirect()->guest(route('login'))
                 : redirect()->route('writeups.mine');
         }
 
-        // Semua input filter divalidasi; nilai tidak valid diabaikan (dianggap "Semua").
         $keyword = mb_substr($this->queryString($request, 'q'), 0, self::SEARCH_MAX_LENGTH);
 
         $categories = Category::query()->orderBy('id')->get(['id', 'name', 'slug']);
@@ -96,11 +78,6 @@ class WriteupController extends Controller
         ]);
     }
 
-    /**
-     * Halaman detail write-up (publik). Draft/terjadwal hanya untuk penulisnya;
-     * selain itu 404 (bukan 403) supaya keberadaan draft tidak bocor.
-     * Write-up yang di-soft-delete sudah 404 lewat route model binding.
-     */
     public function show(Writeup $writeup): View
     {
         abort_unless(Gate::allows('view', $writeup), 404);
@@ -123,9 +100,6 @@ class WriteupController extends Controller
     }
 
     /**
-     * Markdown -> HTML aman. Gambar dipindah keluar dari badan (ditampilkan sebagai galeri),
-     * tautan eksternal diberi target/rel. Hasil `html` satu-satunya yang boleh dicetak dengan {!! !!}.
-     *
      * @param  Collection<int, MediaUpload>  $media
      * @return array{html: string, gambar: list<array{url: string, caption: string, nama_file: string}>}
      */
@@ -137,7 +111,6 @@ class WriteupController extends Controller
             return ['html' => '', 'gambar' => []];
         }
 
-        // meta charset memaksa libxml membaca string sebagai UTF-8.
         $dom = new DOMDocument;
         $sebelumnya = libxml_use_internal_errors(true);
         $dom->loadHTML(
@@ -155,14 +128,12 @@ class WriteupController extends Controller
 
         $gambar = [];
 
-        // Salin ke array dulu: NodeList hidup berubah saat node dihapus.
         foreach (iterator_to_array($dom->getElementsByTagName('img')) as $img) {
             $src = trim($img->getAttribute('src'));
             $alt = trim($img->getAttribute('alt'));
 
             $this->hapusDenganInduk($img, $akar);
 
-            // Hanya http(s) atau path lokal diawali "/" (bukan "//" atau "/\" yang menunjuk host lain).
             if (! $this->srcGambarAman($src)) {
                 continue;
             }
@@ -205,10 +176,6 @@ class WriteupController extends Controller
         return str_starts_with($src, '/') && ! str_starts_with($src, '//') && ! str_starts_with($src, '/\\');
     }
 
-    /**
-     * Hapus node, lalu hapus pula pembungkus inline/paragraf yang jadi kosong
-     * (mis. <p><img></p> atau <a><img></a>).
-     */
     private function hapusDenganInduk(DOMNode $node, DOMElement $akar): void
     {
         $induk = $node->parentNode;
@@ -225,9 +192,6 @@ class WriteupController extends Controller
         }
     }
 
-    /**
-     * Ambil query string sebagai string; array atau tipe lain dianggap kosong.
-     */
     private function queryString(Request $request, string $key): string
     {
         $value = $request->query($key);
@@ -235,15 +199,10 @@ class WriteupController extends Controller
         return is_string($value) ? trim($value) : '';
     }
 
-    /**
-     * Ringkasan kartu dari Markdown: tanpa sintaks, gambar, judul, dan blok kode.
-     */
     private function excerpt(string $markdown): string
     {
-        // Cukup bagian awal; write-up bisa sangat panjang.
         $html = Str::markdown(mb_substr($markdown, 0, 3000), ['html_input' => 'strip']);
 
-        // Judul/blok kode/tabel bukan ringkasan; gambar hilang bersama strip_tags.
         $html = preg_replace('#<(h[1-6]|pre|table)\b.*?</\1>#is', ' ', $html) ?? $html;
         $text = strip_tags(str_replace('<', ' <', $html));
         $text = trim(preg_replace('/\s+/u', ' ', html_entity_decode($text, ENT_QUOTES | ENT_HTML5)) ?? '');
@@ -251,15 +210,11 @@ class WriteupController extends Controller
         return Str::limit($text, 160);
     }
 
-    /**
-     * Halaman "Postingan Saya": semua write-up milik user login (published dan draft).
-     */
     public function mine(Request $request): View
     {
         $writeups = Writeup::query()
             ->where('author_id', $request->user()->id)
             ->with(['category:id,name,slug', 'tags:id,name'])
-            // Draft tidak punya published_at; urut menurut tanggal yang tampil di baris.
             ->orderByRaw('coalesce(published_at, created_at) desc')
             ->orderByDesc('id')
             ->paginate(self::PER_PAGE);
@@ -267,10 +222,6 @@ class WriteupController extends Controller
         return view('writeups.mine', ['writeups' => $writeups]);
     }
 
-    /**
-     * Halaman edit: form yang sama dengan create, berisi data write-up.
-     * Otorisasi: middleware can:update,writeup pada route.
-     */
     public function edit(Writeup $writeup): View
     {
         return view('writeups.edit', [
@@ -288,7 +239,6 @@ class WriteupController extends Controller
         $user = $request->user();
         $status = WriteupStatus::from($data['status']);
 
-        // Slug sengaja tidak diubah supaya URL stabil.
         DB::transaction(function () use ($user, $writeup, $data, $status): void {
             $writeup->update([
                 'category_id' => $data['category_id'],
@@ -310,10 +260,6 @@ class WriteupController extends Controller
             ->with('status', 'Write-up berhasil diperbarui.');
     }
 
-    /**
-     * Hapus write-up (soft delete) setelah password dikonfirmasi ulang.
-     * Otorisasi dan pembatasan percobaan ada di middleware route.
-     */
     public function destroy(Request $request, Writeup $writeup): RedirectResponse
     {
         try {
@@ -324,13 +270,11 @@ class WriteupController extends Controller
                 'password.current_password' => 'Password salah.',
             ]);
         } catch (ValidationException $e) {
-            // Modal di halaman daftar dibuka lagi untuk write-up yang sama.
             $request->session()->flash('hapus_slug', $writeup->slug);
 
             throw $e;
         }
 
-        // Soft delete (bukan forceDelete) agar slug tetap tercadangkan untuk uniqueSlug().
         $writeup->delete();
 
         return redirect()
@@ -338,11 +282,6 @@ class WriteupController extends Controller
             ->with('status', 'Write-up berhasil dihapus.');
     }
 
-    /**
-     * published_at menurut transisi status: draft -> published = sekarang,
-     * published -> published = dipertahankan, published -> draft = null
-     * (konsisten dengan scope Writeup::published()).
-     */
     private function publishedAtBaru(Writeup $writeup, WriteupStatus $status): ?Carbon
     {
         if ($status === WriteupStatus::Draft) {
@@ -356,7 +295,6 @@ class WriteupController extends Controller
 
     public function create(Request $request): View
     {
-        // User banned tidak perlu melihat form yang pasti ditolak saat disimpan.
         abort_unless($request->user()->status === UserStatus::Active, 403);
 
         return view('writeups.create', [
@@ -383,9 +321,6 @@ class WriteupController extends Controller
     }
 
     /**
-     * Simpan write-up beserta relasinya dalam satu transaksi. Jika dua request
-     * berebut slug yang sama, kolom UNIQUE menolaknya dan slug dihitung ulang.
-     *
      * @param  array<string, mixed>  $data
      */
     private function saveWithUniqueSlug(User $user, array $data, WriteupStatus $status): Writeup
@@ -401,7 +336,6 @@ class WriteupController extends Controller
                         'content_md' => $data['content_md'],
                         'difficulty' => $data['difficulty'],
                         'status' => $status,
-                        // published dan draft harus konsisten dengan scope Writeup::published().
                         'published_at' => $status === WriteupStatus::Published ? now() : null,
                     ]);
 
@@ -420,13 +354,8 @@ class WriteupController extends Controller
         }
     }
 
-    /**
-     * Slug dari judul; bila sudah dipakai (termasuk write-up yang di-soft-delete)
-     * tambahkan akhiran -2, -3, dst. Hasil selalu <= 220 karakter.
-     */
     private function uniqueSlug(string $title): string
     {
-        // Sisakan ruang untuk akhiran angka.
         $base = rtrim(mb_substr(Str::slug($title), 0, self::SLUG_MAX_LENGTH - 10), '-');
 
         if ($base === '') {
@@ -448,9 +377,6 @@ class WriteupController extends Controller
         return $slug;
     }
 
-    /**
-     * Tautkan media milik user yang belum punya write-up dan URL-nya muncul di content_md.
-     */
     private function linkMedia(User $user, Writeup $writeup): void
     {
         $ids = $user->mediaUploads()

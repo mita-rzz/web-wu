@@ -67,7 +67,6 @@ class MediaUploadTest extends TestCase
     public function test_ekstensi_dari_client_tidak_dipercaya(): void
     {
         $response = $this->actingAs($this->buatUser())->postJson(route('writeups.media.store'), [
-            // Isinya PNG, tetapi client mengaku .jpg.
             'file' => $this->fileGambar('png', 'foto.jpg'),
         ]);
 
@@ -108,7 +107,6 @@ class MediaUploadTest extends TestCase
     {
         $user = $this->buatUser();
 
-        // Gambar PNG valid yang ditambah byte kosong di belakangnya.
         $terlaluBesar = $this->fileAsli(
             $this->bytesGambar('png').str_repeat("\0", 2 * 1024 * 1024 + 1024),
             'besar.png',

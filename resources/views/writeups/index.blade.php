@@ -1,7 +1,6 @@
 @php
     $punyaFilter = $filters['q'] !== '' || $filters['kategori'] !== null || $filters['level'] !== null;
 
-    // URL dashboard dengan filter saat ini; $ubah menimpa sebagian (halaman selalu kembali ke 1).
     $url = fn (array $ubah = []) => route('dashboard', array_filter(
         array_merge([
             'q' => $filters['q'],
@@ -19,7 +18,6 @@
 <x-public-layout title="Arsip Write-Up - SolveLog">
 
   
-    {{-- Panel pencarian + filter --}}
     <section class="mt-6 rounded-xl border border-borderMain bg-panel p-5">
         <form method="GET" action="{{ route('dashboard') }}" class="flex flex-col gap-3 sm:flex-row">
             @if ($filters['kategori'] !== null)<input type="hidden" name="kategori" value="{{ $filters['kategori'] }}">@endif
@@ -87,7 +85,6 @@
 
             {{ $writeups->links('pagination.solvelog') }}
         @else
-            {{-- Empty state --}}
             <div class="flex flex-col items-center justify-center py-20 text-center">
                 <svg class="mb-4 h-16 w-16 text-borderMain" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>

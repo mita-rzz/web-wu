@@ -2,7 +2,6 @@
     use App\Enums\WriteupDifficulty;
     use Illuminate\Support\Facades\Route;
 
-    // Kelas ditulis utuh (bukan dirakit) supaya terdeteksi Tailwind; sama dengan writeup-row.
     $warnaLevel = [
         'easy' => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
         'medium' => 'bg-amber-500/10 text-amber-400 border-amber-500/25',
@@ -14,7 +13,6 @@
 @endphp
 
 <div class="space-y-6">
-    {{-- Angka --}}
     <div class="grid grid-cols-2 gap-4">
         <div class="rounded-xl border border-borderMain bg-panel p-5">
             <p class="text-xs font-semibold uppercase tracking-wider text-textSec">Terbit</p>
@@ -26,7 +24,6 @@
         </div>
     </div>
 
-    {{-- Per level --}}
     <div class="flex flex-wrap gap-2.5" aria-label="Jumlah write-up terbit per level">
         @foreach (WriteupDifficulty::cases() as $level)
             <span class="inline-flex items-center gap-2 rounded border px-2.5 py-1 text-[11px] font-bold uppercase {{ $warnaLevel[$level->value] }}">
@@ -36,7 +33,6 @@
         @endforeach
     </div>
 
-    {{-- Write-up terbaru --}}
     <section>
         <div class="mb-3 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-textMain sm:text-xl">Write-up terbaru</h2>

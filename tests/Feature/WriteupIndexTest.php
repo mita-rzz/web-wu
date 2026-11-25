@@ -104,7 +104,6 @@ class WriteupIndexTest extends TestCase
             ->assertDontSee('Tulisan Web')
             ->assertSee('1 write-up');
 
-        // Nilai kosong atau slug tidak dikenal = Semua.
         $this->get('/?kategori=')->assertSee('2 write-up');
         $this->get('/?kategori=tidak-ada')->assertSee('2 write-up');
     }
@@ -260,8 +259,8 @@ class WriteupIndexTest extends TestCase
     public function test_chip_dari_database_dan_rute_lama_tetap_berfungsi(): void
     {
         $this->get('/')
-            ->assertSee('Reverse') // kategori dari tabel categories
-            ->assertSee('Insane'); // dari WriteupDifficulty::cases()
+            ->assertSee('Reverse')
+            ->assertSee('Insane');
 
         $this->get('/dashboard')->assertRedirect('/');
         $this->assertSame(url('/'), route('dashboard'));
@@ -281,7 +280,6 @@ class WriteupIndexTest extends TestCase
         $jumlah = count(\DB::getQueryLog());
         \DB::disableQueryLog();
 
-        // Jumlah query tetap, tidak bergantung pada banyaknya kartu.
         $this->assertLessThanOrEqual(10, $jumlah);
     }
 }

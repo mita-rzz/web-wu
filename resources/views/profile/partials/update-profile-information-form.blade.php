@@ -9,7 +9,6 @@
           emailAwal: @js($emailAwal),
           email: @js($emailSekarang),
           bio: @js(old('bio', $user->bio ?? '')),
-          // Password saat ini hanya diminta bila email diganti.
           get emailBerubah() { return this.email.trim().toLowerCase() !== this.emailAwal; },
       }">
     @csrf
@@ -55,7 +54,6 @@
         <x-input-error :messages="$errors->get('email')" :class="$errorClass" />
     </div>
 
-    {{-- Muncul hanya bila email diubah; dinonaktifkan (tidak ikut terkirim) saat tersembunyi. --}}
     <div x-show="emailBerubah" @if ($emailSekarang === $emailAwal) style="display: none" @endif>
         <x-input-label for="current_password" value="Password saat ini" />
         <x-text-input id="current_password" class="mt-1.5" type="password" name="current_password"

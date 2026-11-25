@@ -1,6 +1,4 @@
 @php
-    // Tab awal: "Pengaturan" bila ada error/status flash; selain itu "Ringkasan".
-    // location.hash === '#pengaturan' juga membuka Pengaturan (dicek di init Alpine).
     $tabAwal = ($errors->any() || session('status')) ? 'pengaturan' : 'ringkasan';
 
     $inisial = mb_strtoupper(mb_substr($user->display_name, 0, 1));
@@ -16,7 +14,6 @@
          x-data="{
              tab: @js($tabAwal),
              init() { if (window.location.hash === '#pengaturan') this.tab = 'pengaturan'; },
-             // Panah kiri/kanan, Home, End memindah tab (pola WAI-ARIA tabs).
              geser(event) {
                  const urutan = ['ringkasan', 'pengaturan'];
                  let i = urutan.indexOf(this.tab);
@@ -31,7 +28,6 @@
              },
          }">
 
-        {{-- Tautan kembali --}}
         <div class="mb-7">
             <a href="{{ route('dashboard') }}"
                class="inline-flex items-center gap-1.5 rounded text-sm text-textSec transition hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent">
@@ -42,7 +38,6 @@
             </a>
         </div>
 
-        {{-- Kartu header profil --}}
         <section class="flex items-start gap-4 rounded-xl border border-borderMain bg-panel p-5 sm:gap-5 sm:p-6" aria-label="Profil">
             <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-2xl font-bold text-accent sm:h-20 sm:w-20 sm:text-3xl" aria-hidden="true">{{ $inisial }}</div>
 
@@ -67,7 +62,6 @@
             </div>
         </section>
 
-        {{-- Tab --}}
         <div class="mt-8 flex gap-1 border-b border-borderMain" role="tablist" aria-label="Bagian profil" @keydown="geser($event)">
             <button type="button" role="tab" id="tab-ringkasan" x-ref="tab-ringkasan"
                     aria-controls="panel-ringkasan"

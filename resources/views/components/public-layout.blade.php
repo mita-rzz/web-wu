@@ -1,9 +1,7 @@
 @props(['title' => null])
 
 @php
-    // Gaya tombol "Postingan Saya": aktif bila sedang di halamannya.
     $mineAktif = request()->routeIs('writeups.mine');
-    // Username di header menuju profil; aktif di semua route profile.*.
     $profilAktif = request()->routeIs('profile.*');
 @endphp
 <!DOCTYPE html>
@@ -13,7 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? config('app.name', 'SolveLog') }}</title>
 
-    {{-- Font Inter (sama seperti HTML acuan) --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,20 +19,17 @@
 </head>
 <body class="min-h-screen bg-bgMain font-sans text-textMain antialiased">
 
-    {{-- Efek grid latar + ambient glow (lihat app.css / app.js) --}}
     <div class="ambient-glow" aria-hidden="true"></div>
     <div class="glow-grid" aria-hidden="true"></div>
 
     <div class="mx-auto max-w-container px-4 md:px-6">
 
-        {{-- Header --}}
         <header class="pb-2 pt-6">
             <div class="flex items-center justify-between">
                 <a href="{{ route('dashboard') }}" class="rounded text-2xl font-bold tracking-tight text-accent focus:outline-none focus:ring-2 focus:ring-accent">
                     SolveLog
                 </a>
 
-                {{-- Navigasi desktop --}}
                 <div class="hidden items-center gap-3 md:flex">
                     <a href="{{ route('writeups.mine') }}" @if ($mineAktif) aria-current="page" @endif
                        class="inline-flex h-btn-h items-center rounded-btn border px-4 font-medium transition focus:outline-none focus:ring-2 focus:ring-accent {{ $mineAktif ? 'border-accent bg-accent/10 text-accent' : 'border-borderMain text-textSec hover:border-textSec hover:text-textMain' }}">
@@ -63,7 +57,6 @@
                     </div>
                 </div>
 
-                {{-- Akun mobile (baris 1) --}}
                 <div class="flex items-center gap-3 md:hidden">
                     @auth
                         <a href="{{ route('profile.edit') }}" @if ($profilAktif) aria-current="page" @endif title="{{ Auth::user()->display_name }}"
@@ -81,7 +74,6 @@
                 </div>
             </div>
 
-            {{-- Tombol mobile (baris 2) --}}
             <div class="mt-4 flex gap-3 md:hidden">
                 <a href="{{ route('writeups.mine') }}" @if ($mineAktif) aria-current="page" @endif
                    class="inline-flex h-btn-h flex-1 items-center justify-center rounded-btn border px-4 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-accent {{ $mineAktif ? 'border-accent bg-accent/10 text-accent' : 'border-borderMain text-textSec hover:text-textMain' }}">
@@ -94,7 +86,6 @@
             </div>
         </header>
 
-        {{-- Banner flash --}}
         @if (session('status'))
             <div role="status" class="mt-8 flex flex-col justify-between gap-3 rounded-lg border border-accent/40 bg-emerald-950/40 p-4 text-sm sm:flex-row sm:items-center">
                 <div class="flex items-center gap-2 font-medium text-accent">

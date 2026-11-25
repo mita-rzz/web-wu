@@ -14,7 +14,6 @@
         'Insane' => 'bg-level-insane',
     ];
 
-    // Data contoh sementara, ganti dengan data asli dari database nanti.
     $samples = [
         ['Web',       'Easy',   'Contoh judul write-up pertama', ['#SQLi', 'BurpSuite']],
         ['Pwn',       'Hard',   'Contoh judul write-up kedua',   ['#ROP', 'GDB']],
@@ -29,7 +28,6 @@
   
     
 
-    {{-- PENCARIAN + FILTER --}}
     <section class="border-t border-line">
         <div class="mx-auto max-w-6xl px-6 py-5">
             <form method="GET" action="/">
@@ -71,7 +69,6 @@
         </div>
     </section>
 
-    {{-- DAFTAR WRITE-UP --}}
     <section class="border-t border-line">
         <div class="mx-auto max-w-6xl px-6 pb-16 pt-12">
             <div class="flex items-baseline justify-between">

@@ -12,10 +12,6 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
-    /**
-     * Rapikan input sebelum divalidasi: username/nama dipangkas, email dipangkas dan
-     * dijadikan huruf kecil, bio kosong menjadi null.
-     */
     protected function prepareForValidation(): void
     {
         $data = [];
@@ -53,7 +49,6 @@ class ProfileUpdateRequest extends FormRequest
                 'max:50',
                 'regex:/^[A-Za-z0-9_.-]+$/',
                 Rule::unique(User::class)->ignore($idSendiri),
-                // Unik tanpa memperhatikan huruf besar/kecil (SQLite membedakan, MySQL tidak).
                 function (string $attribute, mixed $value, Closure $fail) use ($idSendiri): void {
                     $sudahAda = User::query()
                         ->whereRaw('lower(username) = ?', [mb_strtolower((string) $value)])
@@ -75,7 +70,6 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($idSendiri),
             ],
-            // Password hanya diminta bila email diganti.
             'current_password' => [
                 Rule::requiredIf(fn (): bool => $this->input('email') !== $this->user()->email),
                 'string',

@@ -31,7 +31,6 @@ class UserSeeder extends Seeder
                 'status' => UserStatus::Active,
             ],
             [
-                // Untuk menguji alur ban
                 'email' => 'banned@example.com',
                 'username' => 'banned',
                 'display_name' => 'User Diblokir',
@@ -50,13 +49,10 @@ class UserSeeder extends Seeder
                 'bio' => $data['bio'],
             ]);
 
-            // Password hanya diisi untuk user baru, supaya seeding ulang tidak mereset password.
-            // Cast 'hashed' pada password_hash meng-hash nilainya otomatis.
             if (! $user->exists) {
                 $user->password_hash = 'password';
             }
 
-            // role, status, dan email_verified_at tidak mass-assignable, jadi pakai forceFill.
             $user->forceFill([
                 'role' => $data['role'],
                 'status' => $data['status'],

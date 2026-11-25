@@ -74,9 +74,6 @@ class WriteupShowTest extends TestCase
         ]);
     }
 
-    /**
-     * Isi <div class="prose-solvelog"> saja (tanpa galeri/header).
-     */
     private function badanHtml(string $html): string
     {
         preg_match('#<div class="prose-solvelog mt-8">(.*)</div>\s*</article>#s', $html, $cocok);
@@ -181,7 +178,6 @@ class WriteupShowTest extends TestCase
         $this->assertStringNotContainsString('<div onclick', $badan);
         $this->assertStringNotContainsString('onerror', $badan);
         $this->assertStringNotContainsString('<div', $badan);
-        // Tag inline dibuang; sisa teksnya tampil sebagai teks biasa, bukan skrip.
         $this->assertStringContainsString('Awal', $badan);
     }
 
@@ -256,7 +252,6 @@ class WriteupShowTest extends TestCase
         $respons = $this->get(route('writeups.show', $writeup))->assertOk();
         $html = $respons->getContent();
 
-        // Galeri: caption di kiri, nama file asli (dari media_uploads) di kanan.
         $respons->assertSee('<figure', false)
             ->assertSee('src="/storage/writeups/2026/11/abc.png"', false)
             ->assertSee('loading="lazy"', false)
@@ -267,7 +262,6 @@ class WriteupShowTest extends TestCase
 
         $this->assertSame(2, substr_count($html, '<img'));
 
-        // Badan tidak memuat gambar dan paragraf pembungkusnya yang kosong ikut hilang.
         $badan = $this->badanHtml($html);
         $this->assertStringNotContainsString('<img', $badan);
         $this->assertStringContainsString('Paragraf awal.', $badan);
@@ -347,7 +341,6 @@ class WriteupShowTest extends TestCase
             ->assertSee('Draft</span>', false)
             ->assertSee(route('writeups.edit', $writeup), false);
 
-        // Tautan judul hanya membungkus teks judul, bukan menu titik tiga.
         $this->assertMatchesRegularExpression(
             '#<h2[^>]*>\s*<a href="'.preg_quote(route('writeups.show', $writeup), '#').'"[^>]*>Judul Bisa Diklik</a>\s*</h2>#',
             $respons->getContent(),
@@ -403,7 +396,6 @@ class WriteupShowTest extends TestCase
 
     public function test_writeups_create_tetap_menuju_form_create(): void
     {
-        // Tamu: ditahan middleware auth (bukan 404 dari {writeup}).
         $this->get('/writeups/create')->assertRedirect(route('login'));
 
         $this->actingAs($this->buatUser())->get('/writeups/create')

@@ -1,4 +1,3 @@
-{{-- Zona berbahaya: hapus akun. $punyaKonten dikirim oleh ProfileController::edit(). --}}
 @php
     $bagHapus = $errors->userDeletion;
 @endphp

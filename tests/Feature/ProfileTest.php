@@ -55,8 +55,6 @@ class ProfileTest extends TestCase
     }
 
     /**
-     * Data form profil yang valid, berdasarkan data user saat ini.
-     *
      * @param  array<string, mixed>  $ubah
      * @return array<string, mixed>
      */
@@ -77,8 +75,6 @@ class ProfileTest extends TestCase
     {
         return $this->actingAs($user)->from('/profile')->patch('/profile', $data);
     }
-
-    // ---------------------------------------------------------------- Halaman
 
     public function test_tamu_diarahkan_ke_login(): void
     {
@@ -120,7 +116,6 @@ class ProfileTest extends TestCase
             ->assertViewHas('jumlahDraft', 1)
             ->assertViewHas('perLevel', ['easy' => 2, 'medium' => 0, 'hard' => 1, 'insane' => 0]);
 
-        // Draft dan terjadwal bukan "terbaru"; judul menjadi tautan karena route detail ada.
         $respons->assertDontSee('Draft Satu')->assertDontSee('Terjadwal');
         $respons->assertSee(route('writeups.show', 'mudah-satu'), false);
     }
@@ -170,13 +165,10 @@ class ProfileTest extends TestCase
 
         $this->assertMatchesRegularExpression($pola, $this->actingAs($user)->get('/')->getContent());
 
-        // Di halaman lain tidak ada aria-current pada tautan profil; di /profile ada (desktop + mobile).
         $this->assertSame(0, preg_match_all('#aria-current="page"\s+title="Penulis suki"#', $this->actingAs($user)->get('/')->getContent()));
         preg_match_all('#aria-current="page"\s+title="Penulis suki"#', $this->actingAs($user)->get('/profile')->getContent(), $cocok);
         $this->assertCount(2, $cocok[0]);
     }
-
-    // ---------------------------------------------------------------- Update profil
 
     public function test_update_username_nama_bio_dan_email_berhasil(): void
     {
@@ -257,7 +249,6 @@ class ProfileTest extends TestCase
         $user = $this->buatUser(username: 'Suki');
         $user->forceFill(['email' => 'suki@example.com'])->save();
 
-        // Sama persis dan beda huruf besar/kecil dengan miliknya sendiri: boleh.
         $this->kirimProfil($user, $this->dataProfil($user))->assertSessionHasNoErrors();
         $this->kirimProfil($user, $this->dataProfil($user, ['username' => 'suki']))->assertSessionHasNoErrors();
 
@@ -315,7 +306,6 @@ class ProfileTest extends TestCase
     {
         $user = $this->buatUser();
 
-        // Huruf besar/spasi dinormalkan lebih dulu, jadi tetap dianggap email yang sama.
         $this->kirimProfil($user, $this->dataProfil($user, ['display_name' => 'Ganti Nama', 'email' => ' PENULIS@example.com ']))
             ->assertSessionHasNoErrors();
 
@@ -343,8 +333,6 @@ class ProfileTest extends TestCase
         $this->assertNotNull($user->email_verified_at);
     }
 
-    // ---------------------------------------------------------------- Password
-
     public function test_ganti_password_berhasil_dan_tersimpan_ter_hash(): void
     {
         $user = $this->buatUser(username: 'suki');
@@ -360,11 +348,9 @@ class ProfileTest extends TestCase
 
         $user->refresh();
         $this->assertNotSame('PasswordBaru-123', $user->password_hash);
-        // Hash::check gagal bila nilainya ter-hash dua kali.
         $this->assertTrue(Hash::check('PasswordBaru-123', $user->password_hash));
         $this->assertFalse(Hash::check('password', $user->password_hash));
 
-        // Login nyata dengan password baru valid, dengan yang lama tidak.
         Auth::logout();
         $this->post('/login', ['email' => 'suki@example.com', 'password' => 'password'])->assertSessionHasErrors();
         $this->assertGuest();
@@ -415,8 +401,6 @@ class ProfileTest extends TestCase
         ])->assertSessionHasErrors('password', errorBag: 'updatePassword');
     }
 
-    // ---------------------------------------------------------------- Hapus akun
-
     public function test_hapus_akun_berhasil_untuk_user_tanpa_write_up(): void
     {
         $user = $this->buatUser();
@@ -450,7 +434,6 @@ class ProfileTest extends TestCase
             ->assertSessionHasErrors(['password' => $pesan], errorBag: 'userDeletion');
         $this->assertDatabaseHas('users', ['id' => $user->id]);
 
-        // Soft-delete tetap menahan baris di database (FK restrictOnDelete).
         $writeup->delete();
 
         $this->actingAs($user)->from('/profile')->delete('/profile', ['password' => 'password'])
@@ -496,8 +479,6 @@ class ProfileTest extends TestCase
             ->assertSee('Akun yang masih memiliki write-up atau gambar tidak bisa dihapus. Hubungi admin.')
             ->assertDontSee('role="dialog"', false);
     }
-
-    // ---------------------------------------------------------------- Performa
 
     public function test_tidak_ada_n_plus_1_pada_halaman_profile(): void
     {

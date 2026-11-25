@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
     Route::put('password', [PasswordController::class, 'update'])
-        ->middleware('throttle:5,1') // batasi tebakan password lama
+        ->middleware('throttle:5,1')
         ->name('password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])

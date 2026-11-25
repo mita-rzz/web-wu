@@ -1,5 +1,4 @@
 <?php
-// app/Models/MediaUpload.php
 
 declare(strict_types=1);
 

@@ -44,4 +44,4 @@ docker compose -f compose.dev.yaml exec app rm -f public/hot
 docker compose -f compose.dev.yaml exec node npm run build
 ```
 
-git archive --format=zip --output=../v16.zip HEAD
+git archive --format=zip --output=../v18.zip HEAD
