@@ -1,7 +1,7 @@
 # SolveLog
 
 Arsip terpusat untuk menyimpan, mengelompokkan, mencari, dan membaca write-up Capture The Flag (CTF) serta bug bounty di Lembaga Edukasi GideonHeker.
-**Demo:** https://solvelog.gideon.my.id/ | **Laporan:** [ISI MANUAL]
+**Demo:** https://solvelog.gideon.my.id/ | **Laporan:** https://docs.google.com/document/d/1xIQkVWRl9uU-JBi7cgRZlDlI2NL4uWwHRq6MtYjlwy8/edit?tab=t.0
 
 ## Tentang Proyek
 
