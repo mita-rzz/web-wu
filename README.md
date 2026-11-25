@@ -31,8 +31,8 @@ Write-up memiliki tingkat kesulitan `easy`, `medium`, `hard`, dan `insane`. Daft
 Ganti placeholder berikut dengan tangkapan layar aktual aplikasi.
 
 - Dashboard: ![Dashboard Icon](/public/images/icon/dashboard.png)
-- Halaman baca write-up: ![Halaman Baca](/public/images/baca.png)
-- Editor write-up: ![Editor Write-up](/public/images/editor.png)
+- Halaman baca write-up: ![Halaman Baca](/public/images/icon/baca.png)
+- Editor write-up: ![Editor Write-up](/public/images/icon/editor.png)
 
 ## Teknologi
 
